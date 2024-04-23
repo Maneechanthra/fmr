@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('restaurant_id');
             $table->string('path');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class restaurant_reviews extends Model
+class Recommended extends Model
 {
-    use SoftDeletes;
     use HasFactory;
     protected $fillable = [
-        'title'
+        'restaurant_name',
+        'telephone_1',
+        'path'
     ];
 }

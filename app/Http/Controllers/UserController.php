@@ -11,13 +11,13 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class UserController extends Controller
 {
 
-    use AuthorizesRequests, ValidatesRequests, DispatchesJobs;
+    use AuthorizesRequests, ValidatesRequests, DispatchesJobs, SoftDeletes;
     public function getUser()
 
     {
@@ -59,7 +59,7 @@ class UserController extends Controller
         $cookie = cookie('jwt', $token, 60 * 24); // 1 day
         return response([
             'email' => $request->email,
-            'user_id' => $user->id,
+            'userId' => $user->id,
             'jwt_token' => $token,
             'name' => $user->name,
             'message' => 'Login Success',
@@ -112,5 +112,15 @@ class UserController extends Controller
         } else {
             return response()->json(array('error' => Response::HTTP_FORBIDDEN, 'message' => null));
         }
+    }
+
+    public function changePassword()
+    {
+    }
+
+    public function logout(Request $request)
+    {
+        $cookie = \Cookie::forget('jwt');
+        return response(['message' => ' logout success'])->withCookie($cookie);
     }
 }

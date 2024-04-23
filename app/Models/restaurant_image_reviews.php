@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class restaurant_reviews extends Model
+class restaurant_image_reviews extends Model
 {
-    use SoftDeletes;
     use HasFactory;
+    use SoftDeletes;
     protected $fillable = [
-        'title'
+        'path'
     ];
 }

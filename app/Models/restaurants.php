@@ -12,6 +12,10 @@ class restaurants extends Model
     use SoftDeletes;
     protected $fillable = [
         'restaurant_name',
-        'telephone_1'
+        'telephone_1',
+        'telephone_2',
+        'address',
+        'latitude',
+        'longitude',
     ];
 }
