@@ -17,6 +17,7 @@ class ReviewController extends Controller
 
     public function insertReview(Request $request)
     {
+        // Create and save the review
         $review = new restaurant_reviews();
         $review->restaurant_id = $request->input('restaurant_id');
         $review->title = $request->input('title');
@@ -25,25 +26,41 @@ class ReviewController extends Controller
         $review->review_by = $request->input('review_by');
         $review->save();
 
+        // Initialize an empty array to store image paths
+        $images = [];
+
+        // Check if there are files to upload
         if ($request->hasFile('path')) {
-            $images = [];
             foreach ($request->file('path') as $image) {
                 if ($image->isValid()) {
+                    // Generate a unique file name
                     $extension = $image->getClientOriginalExtension();
                     $filename = $review->id . '_' . time() . '_' . uniqid() . '.' . $extension;
+                    // Store the file in a specific location
                     $image->storeAs('public/reviews', $filename);
+                    // Add the stored file path to the list
                     $images[] = 'reviews/' . $filename;
                 }
             }
+
+            // Save the image information in the database
             foreach ($images as $imagePath) {
-                $restaurantImage = new restaurant_image_reviews;
+                $restaurantImage = new restaurant_image_reviews();
                 $restaurantImage->review_id = $review->id;
                 $restaurantImage->path = $imagePath;
                 $restaurantImage->save();
             }
         }
-        return response()->json(array('review' => $review));
+
+        // Return a JSON response with the review, review ID, and image paths
+        return response()->json([
+            'review' => $review,
+            'review_id' => $review->id,
+            'images' => $images,
+
+        ]);
     }
+
 
     public function updateReview(Request $request)
     {

@@ -38,7 +38,6 @@ class RestaurantController extends Controller
         $categories->save();
 
 
-
         //insert new openings
         $data = $request->input('openings');
         foreach ($data as $opening) {
