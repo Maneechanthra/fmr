@@ -241,4 +241,10 @@ class RestaurantController extends Controller
         // Return the updated restaurant object
         return response()->json($restaurant);
     }
+
+    public function getMyRestaurants($userId)
+    {
+        $myRestaurant = restaurants::find($userId);
+        return $myRestaurant;
+    }
 }

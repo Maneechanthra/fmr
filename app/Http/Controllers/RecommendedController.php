@@ -22,6 +22,8 @@ class RecommendedController extends Controller
                 'restaurants.restaurant_name',
                 'categories.title',
                 'restaurants.verified',
+                'restaurants.latitude',
+                'restaurants.longitude',
                 'categories.title as category_title',
                 DB::raw('MIN(restaurant_images.path) as image_path'),
                 DB::raw('AVG(restaurant_reviews.rating) as average_rating'),
@@ -39,10 +41,11 @@ class RecommendedController extends Controller
                 'restaurants.restaurant_name',
                 'categories.title',
                 'restaurants.verified',
-                'category_title'
+                'category_title',
+                'restaurants.latitude',
+                'restaurants.longitude',
             )
             ->distinct()
-            ->take(4)
             ->get();
 
         return response()->json(['success' => true, 'restaurants' => $restaurants]);

@@ -81,4 +81,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/edit/email', [UserController::class, 'updateEmail']);
     Route::delete('/user/delete/{user_id}', [UserController::class, 'deleteAccount']);
     Route::post('/logout', [UserController::class, 'logout']);
+    Route::get('/reports/{userId}', [ReportsController::class, 'getReportByuserId']);
+    Route::get('/restaurant/myrestaurant/{userId}', [RestaurantController::class, 'getMyRestaurants']);
 });
