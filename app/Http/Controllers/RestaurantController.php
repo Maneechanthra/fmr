@@ -18,9 +18,9 @@ class RestaurantController extends Controller
 {
     use SoftDeletes;
 
-    public function insertRestaurant(Request $request)
+    // insert restaurant
+    public function createRestaurant(Request $request)
     {
-        //insert a new restaurant
         $restaurant = new restaurants();
         $restaurant->restaurant_name = $request->input('restaurant_name');
         $restaurant->address = $request->input('address');
@@ -31,58 +31,75 @@ class RestaurantController extends Controller
         $restaurant->created_by = $request->input('created_by');
         $restaurant->save();
 
-        //insert a new categorys
-        $categories = new restaurant_categories();
-        $categories->restaurant_id = $restaurant->id;
-        $categories->category_id = $request->input('category_id');
-        $categories->save();
+        return response()->json([
+            'restaurant' => $restaurant,
+            'restaurant_id' => $restaurant->id,
+        ]);
+    }
 
-
-        //insert new openings
-        $data = $request->input('openings');
-        foreach ($data as $opening) {
-            if (isset($opening['day_open']) && isset($opening['time_open']) && isset($opening['time_close'])) {
-                $openTime = new restaurant_openings();
-                $openTime->restaurant_id = $restaurant->id;
-                $openTime->day_open = $opening['day_open'];
-                $time_open = Carbon::createFromFormat('g:i A', $opening['time_open'])->format('H:i:s');
-                $time_close = Carbon::createFromFormat('g:i A', $opening['time_close'])->format('H:i:s');
-                $openTime->time_open = $time_open;
-                $openTime->time_close = $time_close;
-                $openTime->save();
-            }
+    public function insertCategories(Request $request, $restaurantId)
+    {
+        $data = $request->input('category_data');
+        foreach ($data as $item) {
+            $category = new restaurant_categories();
+            $category->restaurant_id = $restaurantId;
+            $category->category_id = $item['category_id'];
+            $category->save();
         }
 
-        //insert new images 
+        return response()->json([
+            'category' => $category,
+        ]);
+    }
+
+    public function insertOpenings(Request $request, $restaurantId)
+    {
+        $data = $request->input('openings');
+        if (!empty($data) && is_array($data)) {
+            foreach ($data as $opening) {
+                if (isset($opening['day_open']) && isset($opening['time_open']) && isset($opening['time_close'])) {
+                    $openTime = new restaurant_openings();
+                    $openTime->restaurant_id = $restaurantId;
+                    $openTime->day_open = $opening['day_open'];
+                    $time_open = Carbon::createFromFormat('g:i A', $opening['time_open'])->format('H:i:s');
+                    $time_close = Carbon::createFromFormat('g:i A', $opening['time_close'])->format('H:i:s');
+                    $openTime->time_open = $time_open;
+                    $openTime->time_close = $time_close;
+                    $openTime->save();
+                }
+            }
+        }
+        return response()->json([
+            'openTime' => $openTime,
+        ]);
+    }
+
+
+    public function insertImages(Request $request, $restaurantId)
+    {
         if ($request->hasFile('path')) {
             $images = [];
             foreach ($request->file('path') as $image) {
                 if ($image->isValid()) {
                     $extension = $image->getClientOriginalExtension();
-                    $filename = $restaurant->id . '_' . time() . '_' . uniqid() . '.' . $extension;
+                    $filename = $restaurantId . '_' . uniqid() . '.' . $extension;
                     $image->storeAs('public/restaurants', $filename);
                     $images[] = 'restaurants/' . $filename;
                 }
             }
             foreach ($images as $imagePath) {
                 $restaurantImage = new restaurant_images();
-                $restaurantImage->restaurant_id = $restaurant->id;
+                $restaurantImage->restaurant_id = $restaurantId;
                 $restaurantImage->path = $imagePath;
                 $restaurantImage->save();
             }
         }
-
-        $responseData = [
-            'success' => true,
-            'restaurant' => $restaurant,
-            'categories' => $categories,
-            'opening' => $data,
-        ];
-
-        return response()->json($responseData, 200);
+        return response()->json([
+            'restaurant_images' => $restaurantImage,
+        ]);
     }
 
-
+    //delete restaurants 
     public function deleteRestaurant($restaurant_id)
     {
         $restaurant = restaurants::find($restaurant_id);
@@ -90,38 +107,387 @@ class RestaurantController extends Controller
         return response()->json(array('success' => true, 'message' => 'Restaurant deleted successfully'), 200);
     }
 
-    //================================== รอแก้ไช ==========================================
-    // public function getRestaurant()
-    // {
-    //     $restaurants = DB::table('restaurants')
-    //         ->select(
-    //             'restaurants.id',
-    //             'restaurants.restaurant_name',
-    //             'categories.title',
-    //             DB::raw('MIN(restaurant_images.path) as image_path'), // เลือกภาพแรก
-    //             DB::raw('AVG(restaurant_reviews.rating) as average_rating'),
-    //             DB::raw('COUNT(restaurant_reviews.id) as review_count')
-    //         )
-    //         ->join('restaurant_categories', 'restaurants.id', '=', 'restaurant_categories.restaurant_id')
-    //         ->join('categories', 'restaurant_categories.category_id', '=', 'categories.id')
-    //         ->join('restaurant_images', 'restaurants.id', '=', 'restaurant_images.restaurant_id')
-    //         ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
-    //         ->groupBy('restaurants.id') // จัดกลุ่มเฉพาะ ID ของร้านเพื่อป้องกันการซ้ำซ้อน
-    //         ->distinct() // ใช้ DISTINCT เพื่อป้องกันข้อมูลซ้ำ
-    //         ->take(4) // เลือกเพียง 4 ร้าน
-    //         ->get();
 
-    //     return response()->json(['success' => true, 'restaurants' => $restaurants]);
-    // }
-
+    // get restaurant by id
     public function getRestaurantById($restaurant_id)
     {
-        // ดึงข้อมูลร้านอาหาร
         $restaurant = DB::table('restaurants')
             ->select(
                 'restaurants.id',
                 'restaurants.restaurant_name',
+                'restaurants.latitude',
+                'restaurants.longitude',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                'restaurants.verified',
+                'restaurants.created_by',
+                // 'restaurant_openings.time_open',
+                // 'restaurant_openings.time_close',
+                DB::raw('IFNULL(AVG(restaurant_reviews.rating), 0) as average_rating'),
+                // DB::raw('COUNT(DISTINCT restaurant_reviews.id) as review_count'),
+                DB::raw('COUNT(DISTINCT CASE WHEN restaurant_reviews.deleted_at IS NULL THEN restaurant_reviews.id ELSE NULL END) as review_count'),
+
+                DB::raw('COUNT(DISTINCT restaurant_favorites.id) as favorites_count'),
+                DB::raw('COUNT(DISTINCT restaurant_views.id) as view_count')
+            )
+            ->leftJoin('restaurant_categories', 'restaurants.id', '=', 'restaurant_categories.restaurant_id')
+            ->leftJoin('restaurant_favorites', 'restaurants.id', '=', 'restaurant_favorites.restaurant_id')
+            ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
+            ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
+            ->leftJoin('restaurant_openings', 'restaurants.id', '=', 'restaurant_openings.restaurant_id')
+            ->where('restaurants.id', $restaurant_id)
+            ->whereNull('restaurants.deleted_at')
+            // ->whereNull('restaurant_reviews.deleted_at')
+
+            ->groupBy(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.latitude',
+                'restaurants.longitude',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                'restaurants.verified',
+                'restaurants.created_by',
+                // 'restaurant_openings.time_open',
+                // 'restaurant_openings.time_close',
+            )
+            ->first();
+
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurant not found'], 404);
+        }
+
+        // Retrieve restaurant categories
+        $restaurant->restaurant_category = DB::table('restaurant_categories')
+            ->select('categories.title as category_title')
+            ->join('categories', 'restaurant_categories.category_id', '=', 'categories.id')
+            ->where('restaurant_id', $restaurant_id)
+            ->whereNull('restaurant_categories.deleted_at')
+            ->pluck('category_title');
+
+        $restaurant->image_paths = DB::table('restaurant_images')
+            ->where('restaurant_id', $restaurant_id)
+            ->whereNull('deleted_at')
+            ->where('path', 'like', 'restaurants/%')
+            ->pluck('path');
+
+
+        // Retrieve restaurant opeinng
+        $restaurant->openings = DB::table('restaurant_openings')
+            ->where('restaurant_id', $restaurant_id)
+            ->whereNull('deleted_at')
+            ->get();
+
+        // Retrieve restaurant reviews
+        $restaurant->reviews = DB::table('restaurant_reviews')
+            ->select(
+                'restaurant_reviews.title',
+                'restaurant_reviews.content',
+                'restaurant_reviews.id',
+                'restaurant_reviews.rating',
+                'users.name',
+                'restaurant_reviews.created_at'
+            )
+            ->join('users', 'users.id', '=', 'restaurant_reviews.review_by')
+            ->where('restaurant_id', $restaurant_id)
+            ->whereNull('restaurant_reviews.deleted_at')
+            ->get();
+
+        // Retrieve image paths for each review
+        foreach ($restaurant->reviews as $review) {
+            $review->image_paths_review = DB::table('restaurant_image_reviews')
+                ->where('review_id', $review->id)
+
+                ->pluck('path');
+        }
+
+        return response()->json($restaurant);
+    }
+
+
+    //updated restaurant
+    public function updateRestaurant(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+        ]);
+
+        $restaurant = restaurants::find($request->id);
+        if (!$restaurant) {
+            return response()->json(['error' => 'Restaurant not found'], 404);
+        }
+
+        if ($request->has('restaurant_name')) {
+            $restaurant->restaurant_name = $request->restaurant_name;
+        }
+        if ($request->has('telephone_1')) {
+            $restaurant->telephone_1 = $request->telephone_1;
+        }
+        if ($request->has('telephone_2')) {
+            $restaurant->telephone_2 = $request->telephone_2;
+        }
+        if ($request->has('latitude')) {
+            $restaurant->latitude = $request->latitude;
+        }
+        if ($request->has('longitude')) {
+            $restaurant->longitude = $request->longitude;
+        }
+        if ($request->has('address')) {
+            $restaurant->address = $request->address;
+        }
+
+        $restaurant->save();
+
+        return response()->json($restaurant);
+    }
+    public function updatedImages(Request $request, $restaurantId)
+    {
+        $restaurantImage = null;
+
+        if ($request->hasFile('path')) {
+            $images = [];
+            foreach ($request->file('path') as $image) {
+                if ($image->isValid()) {
+                    $extension = $image->getClientOriginalExtension();
+                    $filename = $restaurantId . '_' . time() . '_' . uniqid() . '.' . $extension;
+                    $image->storeAs('public/restaurants', $filename);
+                    $images[] = 'restaurants/' . $filename;
+                }
+            }
+
+            $oldImages = restaurant_images::where('restaurant_id', $restaurantId)
+                ->where('path', 'LIKE', 'restaurants/%')
+                ->get();
+
+            foreach ($oldImages as $oldImage) {
+                Storage::delete('public/' . $oldImage->path);
+                $oldImage->delete();
+            }
+
+            foreach ($images as $imagePath) {
+                $restaurantImage = new restaurant_images;
+                $restaurantImage->restaurant_id = $restaurantId;
+                $restaurantImage->path = $imagePath;
+                $restaurantImage->save();
+            }
+        }
+
+        return response()->json([
+            'restaurant_images' => $restaurantImage,
+        ]);
+    }
+
+    public function updatedOpenings(Request $request, $restaurantId)
+    {
+        $data = $request->input('openings');
+        if (!empty($data) && is_array($data)) {
+            // ลบข้อมูลเก่าก่อน
+            restaurant_openings::where('restaurant_id', $restaurantId)->delete();
+
+            foreach ($data as $opening) {
+                if (isset($opening['day_open']) && isset($opening['time_open']) && isset($opening['time_close'])) {
+                    $openTime = new restaurant_openings();
+                    $openTime->restaurant_id = $restaurantId;
+                    $openTime->day_open = $opening['day_open'];
+                    $time_open = Carbon::createFromFormat('g:i A', $opening['time_open'])->format('H:i:s');
+                    $time_close = Carbon::createFromFormat('g:i A', $opening['time_close'])->format('H:i:s');
+                    $openTime->time_open = $time_open;
+                    $openTime->time_close = $time_close;
+                    $openTime->save();
+                }
+            }
+        }
+
+        return response()->json([
+            'message' => 'Opening hours updated successfully.',
+        ]);
+    }
+
+
+    public function updateCategories(Request $request, $restaurantId)
+    {
+        $data = $request->input('category_data');
+
+        restaurant_categories::where('restaurant_id', $restaurantId)->delete();
+
+        foreach ($data as $item) {
+            $category = new restaurant_categories();
+            $category->restaurant_id = $restaurantId;
+            $category->category_id = $item['category_id'];
+            $category->save();
+        }
+
+        return response()->json([
+            'message' => 'Categories updated successfully.',
+        ]);
+    }
+
+
+    // get my restaurants
+    public function getMyRestaurants($userId)
+    {
+        $restaurants = DB::table('restaurants')
+            ->select(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.latitude',
+                'restaurants.longitude',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                'restaurants.verified',
+                'restaurants.status',
+                'restaurants.created_by',
+                'users.name',
+
+                // DB::raw('GROUP_CONCAT(DISTINCT categories.title) as categories'),
+                DB::raw('MIN(restaurant_images.path) as image_path'),
+                DB::raw('IFNULL(AVG(restaurant_reviews.rating), 0) as average_rating'),
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_reviews.id), 0) as review_count'),
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_favorites.id), 0) as favorites_count'),
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_views.id), 0) as view_count'),
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_reports.id), 0) as reports_count')
+            )
+            ->leftJoin('restaurant_categories', 'restaurants.id', '=', 'restaurant_categories.restaurant_id')
+            ->leftJoin('categories', 'restaurant_categories.category_id', '=', 'categories.id')
+            ->leftJoin('restaurant_images', function ($join) {
+                $join->on('restaurants.id', '=', 'restaurant_images.restaurant_id')
+                    ->whereNull('restaurant_images.deleted_at');
+            })
+            ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
+            ->leftJoin('restaurant_favorites', 'restaurants.id', '=', 'restaurant_favorites.restaurant_id')
+            ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
+            ->leftJoin('restaurant_reports', 'restaurants.id', '=', 'restaurant_reports.restaurant_id')
+            ->leftJoin('users', 'restaurants.created_by', '=', 'users.id')
+            ->where('restaurants.created_by', '=', $userId)
+            ->whereNull('restaurants.deleted_at')
+
+            ->groupBy(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.latitude',
+                'restaurants.longitude',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                'restaurants.verified',
+                'restaurants.status',
+                'restaurants.created_by',
+                'users.name',
+            )
+            ->get();
+
+        foreach ($restaurants as $restaurant) {
+            // Retrieve restaurant categories
+            $restaurant->restaurant_categories = DB::table('restaurant_categories')
+                ->select('categories.id', 'categories.title as category_title')
+                ->join('categories', 'restaurant_categories.category_id', '=', 'categories.id')
+                ->where('restaurant_id', $restaurant->id)
+                ->whereNull('restaurant_categories.deleted_at')
+                ->get()
+                ->map(function ($category) {
+                    return [
+                        "id" => $category->id,
+                        "category_title" => $category->category_title
+                    ];
+                });
+
+
+
+
+            // Retrieve restaurant images
+            $restaurant->image_paths = DB::table('restaurant_images')
+                ->where('restaurant_id', $restaurant->id)
+                ->whereNull('deleted_at')
+                ->where('path', 'like', 'restaurants/%')
+                ->pluck('path');
+
+            // Retrieve restaurant openings
+            $restaurant->openings = DB::table('restaurant_openings')
+                ->where('restaurant_id', $restaurant->id)
+                ->whereNull('restaurant_openings.deleted_at')
+                ->get();
+
+            // Retrieve restaurant reviews
+            $restaurant->reviews = DB::table('restaurant_reviews')
+                ->select(
+                    'restaurant_reviews.title',
+                    'restaurant_reviews.content',
+                    'restaurant_reviews.id',
+                    'restaurant_reviews.rating',
+                    'users.name',
+                    'restaurant_reviews.created_at'
+                )
+                ->join('users', 'users.id', '=', 'restaurant_reviews.review_by')
+                ->where('restaurant_id', $restaurant->id)
+                // ->whereNull('restaurant_reviews.deleted_at')
+                ->get();
+
+            // Retrieve image paths for each review
+            foreach ($restaurant->reviews as $review) {
+                $review->image_paths_review = DB::table('restaurant_image_reviews')
+                    ->where('review_id', $review->id)
+                    // ->whereNull('restaurant_reviews.deleted_at')
+                    ->pluck('path');
+            }
+        }
+
+        return response()->json($restaurants);
+    }
+
+
+
+    // get search restaurants
+    public function getRestaurantsSearchByName()
+    {
+        $restaurants = DB::table('restaurants')
+            ->select(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'categories.title',
+                'restaurants.verified',
+                'restaurants.status',
+                // 'restaurants.longitude',
                 'categories.title as category_title',
+                DB::raw('MIN(restaurant_images.path) as image_path'),
+                DB::raw('AVG(restaurant_reviews.rating) as average_rating'),
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_reviews.id), 0) as review_count'),
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_favorites.id), 0) as favorites_count'),
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_views.id), 0) as view_count'),
+            )
+            ->join('restaurant_categories', 'restaurants.id', '=', 'restaurant_categories.restaurant_id')
+            ->join('categories', 'restaurant_categories.category_id', '=', 'categories.id')
+            ->join('restaurant_images', function ($join) {
+                $join->on('restaurants.id', '=', 'restaurant_images.restaurant_id')
+                    ->whereNull('restaurant_images.deleted_at');
+            })
+            ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
+            ->leftJoin('restaurant_favorites', 'restaurants.id', '=', 'restaurant_favorites.restaurant_id')
+            ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
+            ->groupBy(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'categories.title',
+                'restaurants.verified',
+                'category_title',
+                'restaurants.status',
+                // 'restaurants.longitude',
+
+            )
+            ->get();
+
+        return response()->json($restaurants);
+    }
+
+    //restaurants for map page
+    public function getRestaurantForMap()
+    {
+        $restaurants = DB::table('restaurants')
+            ->select(
+                'restaurants.id',
+                'restaurants.restaurant_name',
                 'restaurants.latitude',
                 'restaurants.longitude',
                 'restaurants.address',
@@ -138,7 +504,7 @@ class RestaurantController extends Controller
             ->leftJoin('restaurant_favorites', 'restaurants.id', '=', 'restaurant_favorites.restaurant_id')
             ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
             ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
-            ->where('restaurants.id', $restaurant_id)
+            ->whereNull('restaurants.deleted_at')
             ->groupBy(
                 'restaurants.id',
                 'restaurants.restaurant_name',
@@ -148,103 +514,87 @@ class RestaurantController extends Controller
                 'restaurants.telephone_1',
                 'restaurants.telephone_2',
                 'restaurants.verified',
-                'category_title'
             )
-            ->first();
+            ->get();
 
-        if (!$restaurant) {
+        if ($restaurants->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'Restaurant not found'], 404);
         }
 
-        $image_paths = DB::table('restaurant_images')
-            ->where('restaurant_id', $restaurant_id)
-            ->whereNull('restaurant_images.deleted_at')
-            ->pluck('path');
+        foreach ($restaurants as $restaurant) {
+            $category_restaurant = DB::table('restaurant_categories')
+                ->select('categories.title as category_title',)
 
-        $restaurant->image_paths = $image_paths;
+                ->join('restaurants', 'restaurant_categories.restaurant_id', '=', 'restaurants.id')
+                ->join('categories', 'restaurant_categories.category_id', '=', 'categories.id')
+                ->where('restaurant_id', $restaurant->id)
+                ->whereNull('restaurant_categories.deleted_at')
+                ->pluck('category_title');
 
+            $restaurant->restaurant_category = $category_restaurant;
+        }
 
-        $reviews = DB::table('restaurant_reviews')
-            ->select('restaurant_reviews.title', 'restaurant_reviews.content', 'restaurant_reviews.id', 'restaurant_reviews.rating', 'users.name', 'restaurant_reviews.created_at')
-            ->join('users', 'users.id', '=', 'restaurant_reviews.review_by')
-            ->where('restaurant_id', $restaurant_id)
-            ->get();
+        $categories = DB::table('categories')->select('title')->get();
 
-
-        foreach ($reviews as $review) {
-            $image_paths_review = DB::table('restaurant_image_reviews')
-                ->where('review_id', $review->id)
+        foreach ($restaurants as $restaurant) {
+            $image_paths = DB::table('restaurant_images')
+                ->where('restaurant_id', $restaurant->id)
+                ->whereNull('restaurant_images.deleted_at')
                 ->pluck('path');
 
-            $review->image_paths_review = $image_paths_review;
+            $restaurant->image_paths = $image_paths;
         }
 
-        $restaurant->reviews = $reviews;
-
-        return response()->json(['success' => true, 'restaurant' => $restaurant]);
+        return response()->json(['success' => true, 'restaurants' => $restaurants, 'categories' => $categories]);
     }
 
-    public function updateRestaurant(Request $request)
+    // verified update restaurant
+    public function verifiedRestaurant(Request $request, $restaurantId)
     {
-        // Validate incoming request data
+
         $request->validate([
-            'id' => 'required',
-            'restaurant_name' => 'required',
-            'telephone_1' => 'required',
-            'telephone_2' => 'required',
-            'latitude' => 'nullable|numeric|between:-90,90', // Valid latitude
-            'longitude' => 'required|numeric', // Valid longitude
-            'address' => 'required',
+            // 'restaurant_name' => 'required|string|max:255',
+            'updated_by' => 'required|integer',
         ]);
 
-        // Find the restaurant by its ID
-        $restaurant = restaurants::find($request->id);
+        $restaurant = restaurants::find($restaurantId);
         if (!$restaurant) {
-            return response()->json(['error' => 'Restaurant not found'], 404); // Error handling for restaurant not found
+            return response()->json(['error' => 'Restaurant not found'], 404);
         }
-        $restaurant->restaurant_name = $request->restaurant_name;
-        $restaurant->telephone_1 = $request->telephone_1;
-        $restaurant->telephone_2 = $request->telephone_2;
-        $restaurant->latitude = $request->latitude;
-        $restaurant->longitude = $request->longitude;
-        $restaurant->address = $request->address;
-        $restaurant->save(); // Ensure the changes are saved to the database
+        // $restaurant->restaurant_name = $request->input('restaurant_name');
+        // $restaurant->created_by = $request->input('created_by');
+        $restaurant->verified = 1;
+        $restaurant->updated_by = $request->input('updated_by');
 
-        // Check if there are files to upload
+        $restaurant->save();
+        return response()->json([
+            'restaurant' => $restaurant,
+            'restaurant_id' => $restaurant->id,
+        ]);
+    }
+
+
+    public function insertImagesForVerified(Request $request, $restaurantId)
+    {
         if ($request->hasFile('path')) {
             $images = [];
             foreach ($request->file('path') as $image) {
                 if ($image->isValid()) {
                     $extension = $image->getClientOriginalExtension();
-                    $filename = $restaurant->id . '_' . time() . '_' . uniqid() . '.' . $extension;
-                    $image->storeAs('public/restaurants', $filename); // Save the image
-                    $images[] = 'restaurants/' . $filename; // Keep track of stored images
+                    $filename = $restaurantId . '_' . uniqid() . '.' . $extension;
+                    $image->storeAs('public/verified', $filename);
+                    $images[] = 'verified/' . $filename;
                 }
             }
-
-            // Delete old images from storage and the database
-            $oldImages = restaurant_images::where('restaurant_id', $restaurant->id)->get();
-            foreach ($oldImages as $oldImage) {
-                Storage::delete('public/' . $oldImage->path); // Delete the file
-                $oldImage->delete(); // Delete the database record
-            }
-
-            // Store new images in the database
             foreach ($images as $imagePath) {
-                $restaurantImage = new restaurant_images;
-                $restaurantImage->restaurant_id = $restaurant->id;
+                $restaurantImage = new restaurant_images();
+                $restaurantImage->restaurant_id = $restaurantId;
                 $restaurantImage->path = $imagePath;
-                $restaurantImage->save(); // Save the new image record
+                $restaurantImage->save();
             }
         }
-
-        // Return the updated restaurant object
-        return response()->json($restaurant);
-    }
-
-    public function getMyRestaurants($userId)
-    {
-        $myRestaurant = restaurants::find($userId);
-        return $myRestaurant;
+        return response()->json([
+            'restaurant_images' => $restaurantImage,
+        ]);
     }
 }

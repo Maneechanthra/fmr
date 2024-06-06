@@ -9,6 +9,7 @@ use App\Models\restaurant_reviews;
 use App\Models\restaurant_image_reviews;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
@@ -26,37 +27,34 @@ class ReviewController extends Controller
         $review->review_by = $request->input('review_by');
         $review->save();
 
-        // Initialize an empty array to store image paths
-        $images = [];
+        // Return a JSON response with the review and review ID
+        return response()->json([
+            'review' => $review,
+            'review_id' => $review->id,
+        ]);
+    }
 
-        // Check if there are files to upload
+    public function insertReviewImage(Request $request, $review_id)
+    {
         if ($request->hasFile('path')) {
+            $images = [];
             foreach ($request->file('path') as $image) {
                 if ($image->isValid()) {
-                    // Generate a unique file name
                     $extension = $image->getClientOriginalExtension();
-                    $filename = $review->id . '_' . time() . '_' . uniqid() . '.' . $extension;
-                    // Store the file in a specific location
+                    $filename = $review_id . '_' . uniqid() . '.' . $extension;
                     $image->storeAs('public/reviews', $filename);
-                    // Add the stored file path to the list
                     $images[] = 'reviews/' . $filename;
                 }
             }
-
-            // Save the image information in the database
             foreach ($images as $imagePath) {
                 $restaurantImage = new restaurant_image_reviews();
-                $restaurantImage->review_id = $review->id;
+                $restaurantImage->review_id = $review_id;
                 $restaurantImage->path = $imagePath;
                 $restaurantImage->save();
             }
         }
-
-        // Return a JSON response with the review, review ID, and image paths
         return response()->json([
-            'review' => $review,
-            'review_id' => $review->id,
-            'images' => $images,
+            'restaurant_reviews_images' => $restaurantImage,
 
         ]);
     }
@@ -115,5 +113,40 @@ class ReviewController extends Controller
         } else {
             return response()->json(array('review' => $review));
         }
+    }
+
+    public function getReviewByRestaurant($restaurant_id)
+    {
+        $reviews = DB::table('restaurant_reviews')
+            ->select(
+                'restaurant_reviews.title',
+                'restaurant_reviews.content',
+                'restaurant_reviews.id',
+                'restaurant_reviews.rating',
+                'restaurant_reviews.restaurant_id',
+                'users.name',
+                'users.id as userId',
+                'restaurant_reviews.created_at'
+            )
+            ->join('users', 'users.id', '=', 'restaurant_reviews.review_by')
+            ->where('restaurant_id', $restaurant_id)
+            ->whereNull('restaurant_reviews.deleted_at')
+            ->get();
+
+        foreach ($reviews as $review) {
+            $image_paths_review = DB::table('restaurant_image_reviews')
+                ->where('review_id', $review->id)
+                ->pluck('path');
+
+            $review->image_paths = $image_paths_review;
+        }
+        return response()->json($reviews);
+    }
+    public function aa()
+    {
+        $reviews = DB::table('restaurant_reviews')
+            ->select('restaurant_reviews.title', 'restaurant_reviews.content', 'restaurant_reviews.id', 'restaurant_reviews.rating', 'restaurant_reviews.created_at')
+            ->get();
+        return response()->json($reviews);
     }
 }

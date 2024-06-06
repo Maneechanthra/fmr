@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\categories\Category;
 use App\Models\restaurant_categories;
+use Illuminate\Support\Facades\DB;
 
 class Categories extends Controller
 {
@@ -17,5 +18,11 @@ class Categories extends Controller
         $category->save();
 
         return $category;
+    }
+
+    public function getCategory()
+    {
+        $category = DB::table('categories')->get();
+        return response()->json($category);
     }
 }
