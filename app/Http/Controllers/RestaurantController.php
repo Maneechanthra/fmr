@@ -597,4 +597,49 @@ class RestaurantController extends Controller
             'restaurant_images' => $restaurantImage,
         ]);
     }
+
+    // ----------------------------------------------------------------
+    // ----------------------------------------------------------------
+
+    //all restaurant and user
+    public function getAllRestaurant()
+    {
+
+        $restaurantsCount = DB::table('restaurants')->whereNull('deleted_at')->count();
+
+        // Fetch all restaurants
+        $restaurant = DB::table('restaurants')
+            ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
+            ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
+            ->leftJoin('restaurant_favorites', 'restaurants.id', '=', 'restaurant_favorites.restaurant_id')
+            ->whereNull('restaurants.deleted_at')
+            ->select(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_views.id), 0) as view_count'),
+                'restaurants.status',
+                'restaurants.verified',
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_reviews.id), 0) as review_count'),
+                DB::raw('COUNT(DISTINCT CASE WHEN restaurant_favorites.deleted_at IS NULL THEN restaurant_favorites.id ELSE NULL END) as favorites_count'),
+            )
+            ->groupBy(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                'restaurants.status',
+                'restaurants.verified'
+            )->orderBy('view_count', 'desc')
+            ->get();
+
+        return view('report.report_restaurant', [
+            'data' => $restaurant,
+            'restaurantsCount' => $restaurantsCount,
+
+        ]);
+    }
 }

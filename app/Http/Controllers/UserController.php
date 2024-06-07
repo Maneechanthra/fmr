@@ -150,32 +150,6 @@ class UserController extends Controller
     }
 
     // change password
-    // public function changePassword($userId, Request $request)
-    // {
-    //     if (!isset($_POST['oldPassword'], $_POST['newPassword'])) {
-    //         return false;
-    //     }
-
-    //     $oldPassword = $_POST['oldPassword'];
-    //     $newPassword = $_POST['newPassword'];
-
-
-    //     $user = User::find($userId);
-    //     if (!$user) {
-
-    //         return false;
-    //     }
-    //     if (!password_verify($oldPassword, $user->password)) {
-
-    //         return false;
-    //     }
-
-
-    //     $user->password = password_hash($newPassword, PASSWORD_DEFAULT);
-    //     $user->save();
-
-    //     return response()->json($user);
-    // }
     public function changePassword(Request $request)
     {
         $user = Auth::user();
@@ -183,7 +157,6 @@ class UserController extends Controller
         $currentPassword = $request->input('current_password');
         $newPassword = $request->input('new_password');
 
-        // Check if the current password and the new password are the same
         if (Hash::check($newPassword, $user->password)) {
             return response()->json(['message' => 'รหัสผ่านใหม่ต้องแตกต่างจากรหัสผ่านปัจจุบัน'], 400);
         }
@@ -203,10 +176,136 @@ class UserController extends Controller
         }
     }
 
-    // logput
+    // logout
     public function logout(Request $request)
     {
         $cookie = \Cookie::forget('jwt');
         return response(['message' => ' logout success'])->withCookie($cookie);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// management of admin
+
+    //all restaurant and user
+    public function index()
+    {
+        // Fetch user and restaurant information
+        $information = DB::table('users')
+            ->leftJoin('restaurants', 'users.id', '=', 'restaurants.created_by')
+            ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
+            ->whereNull('users.deleted_at')
+            ->whereNull('restaurants.deleted_at')
+            ->select(
+                'users.id as user_id',
+                'users.name as user_name',
+                'users.email as user_email',
+                'restaurants.id as restaurant_id',
+                'restaurants.restaurant_name as restaurant_name'
+            )
+            ->get();
+
+        // Count total users
+        $totalUsers = DB::table('users')->whereNull('deleted_at')->count();
+        // Count total restaurants
+        $restaurantsCount = DB::table('restaurants')->whereNull('deleted_at')->count();
+
+        // Fetch all restaurants
+        $topRestaurants = DB::table('restaurants')
+            ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
+            ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
+            ->leftJoin('restaurant_favorites', 'restaurants.id', '=', 'restaurant_favorites.restaurant_id')
+            ->whereNull('restaurants.deleted_at')
+            ->select(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_views.id), 0) as view_count'),
+                'restaurants.status',
+                'restaurants.verified',
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_reviews.id), 0) as review_count'),
+                DB::raw('COUNT(DISTINCT CASE WHEN restaurant_favorites.deleted_at IS NULL THEN restaurant_favorites.id ELSE NULL END) as favorites_count'),
+            )
+            ->groupBy(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                'restaurants.status',
+                'restaurants.verified'
+            )->orderBy('view_count', 'desc')
+            ->get();
+
+        return view('index', [
+            'data' => $information,
+            'total_users' => $totalUsers,
+            'restaurantsCount' => $restaurantsCount,
+            'topRestaurants' => $topRestaurants,
+        ]);
+    }
+
+    // get user information 
+    public function reportInfoUser()
+    {
+        $information = DB::table('users')
+            ->select(
+                'users.id as user_id',
+                'users.name as user_name',
+                'users.email as user_email',
+                'users.role'
+            )
+            // ->where('users.role', '=', '0')
+            ->whereNull('users.deleted_at')
+            ->get();
+
+        $totalUsers = DB::table('users')->whereNull('deleted_at')->count();
+
+        return view('report.report_user', [
+            'data' => $information,
+            'users_count' => $totalUsers,
+        ]);
+    }
+
+    public function reportInfoUserAndAdjustStatus()
+    {
+        $information = DB::table('users')
+            ->select(
+                'users.id as user_id',
+                'users.name as user_name',
+                'users.email as user_email',
+                'users.role'
+            )
+            ->where('users.role', '=', '0')
+            ->whereNull('users.deleted_at')
+            ->get();
+
+        $totalUsers = DB::table('users')->whereNull('deleted_at')->count();
+
+        return view('management.user_management', [
+            'user' => $information,
+            'users_count' => $totalUsers,
+        ]);
+    }
+    public function updateStatus($id)
+    {
+        DB::table('users')
+            ->where('id', $id)
+            ->update(['role' => 1]);
+
+        return redirect()->back()->with('success', 'Status updated successfully');
+    }
+
+    public function deleteUser($user_id)
+    {
+        $user = User::find($user_id);
+        if ($user) {
+            $user->delete();
+            return redirect()->back()->with('success', 'Status updated successfully');
+        } else {
+            return response()->json(array('error' => Response::HTTP_FORBIDDEN, 'message' => null));
+        }
     }
 }

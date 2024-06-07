@@ -1,0 +1,71 @@
+.dataTables_wrapper {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+table.dataTable {
+    width: 100%;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+table.dataTable thead th {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+table.dataTable tbody tr {
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #ddd;
+}
+
+table.dataTable tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: #e9e9e9;
+}
+
+table.dataTable tbody td {
+    text-align: center;
+    padding: 10px;
+}
+
+table.dataTable tfoot th {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+.dataTables_length,
+.dataTables_filter,
+.dataTables_info,
+.dataTables_paginate {
+    margin: 20px 0;
+}
+
+.dataTables_length select,
+.dataTables_filter input {
+    border: 1px solid #ddd;
+    padding: 5px;
+    margin: 0 5px;
+    border-radius: 4px;
+}
+
+.dataTables_paginate a {
+    color: #4CAF50;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    margin: 0 2px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.dataTables_paginate a:hover {
+    background-color: #4CAF50;
+    color: white;
+}
