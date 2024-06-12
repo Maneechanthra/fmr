@@ -4,7 +4,7 @@
 <section class="main">
       <div class="main-top">
             <h1>FMRestaurant</h1>
-            <i class="fas fa-user-cog"></i>
+            <p> {{ $userData['name'] }}</p>
       </div>
       <div class="users">
             <div class="card">
@@ -66,10 +66,6 @@
                                           รับรองแล้ว
                                           @endif
                                     </td>
-
-
-
-
                               </tr>
                               @endforeach
                         </tbody>

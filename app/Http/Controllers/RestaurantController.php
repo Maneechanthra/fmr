@@ -18,6 +18,7 @@ class RestaurantController extends Controller
 {
     use SoftDeletes;
 
+
     // insert restaurant
     public function createRestaurant(Request $request)
     {
@@ -302,6 +303,7 @@ class RestaurantController extends Controller
 
         return response()->json([
             'message' => 'Opening hours updated successfully.',
+            'openings' =>    $openTime,
         ]);
     }
 
@@ -321,6 +323,7 @@ class RestaurantController extends Controller
 
         return response()->json([
             'message' => 'Categories updated successfully.',
+
         ]);
     }
 
@@ -606,8 +609,6 @@ class RestaurantController extends Controller
     {
 
         $restaurantsCount = DB::table('restaurants')->whereNull('deleted_at')->count();
-
-        // Fetch all restaurants
         $restaurant = DB::table('restaurants')
             ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
             ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
@@ -640,6 +641,157 @@ class RestaurantController extends Controller
             'data' => $restaurant,
             'restaurantsCount' => $restaurantsCount,
 
+        ]);
+    }
+
+    public function getAllRestaurantForManagement()
+    {
+
+        $restaurantsCount = DB::table('restaurants')->whereNull('deleted_at')->count();
+        $restaurant = DB::table('restaurants')
+            ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
+            ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
+            ->leftJoin('restaurant_favorites', 'restaurants.id', '=', 'restaurant_favorites.restaurant_id')
+            ->whereNull('restaurants.deleted_at')
+            ->select(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_views.id), 0) as view_count'),
+                'restaurants.status',
+                'restaurants.verified',
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_reviews.id), 0) as review_count'),
+                DB::raw('COUNT(DISTINCT CASE WHEN restaurant_favorites.deleted_at IS NULL THEN restaurant_favorites.id ELSE NULL END) as favorites_count'),
+            )
+            ->groupBy(
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                'restaurants.status',
+                'restaurants.verified'
+            )->get();
+
+        return view('management.restaurant_management', [
+            'restaurants' => $restaurant,
+            'restaurantsCount' => $restaurantsCount,
+
+        ]);
+    }
+
+    public function deleteRestaurantForManagement($restaurant_id)
+    {
+        $restaurants = restaurants::find($restaurant_id);
+        if ($restaurants) {
+            $restaurants->delete();
+            return redirect()->back()->with('success', 'delete success');
+        } else {
+            return response()->json(array('error' => Response::HTTP_FORBIDDEN, 'message' => null));
+        }
+    }
+
+    public function getAllRestaurantForVerify()
+    {
+
+        $verifCount = DB::table('restaurants')->where('restaurants.verified', '=', '1')->count();
+        $restaurantsCount = DB::table('restaurants')->whereNull('deleted_at')->count();
+        $restaurant = DB::table('restaurants')
+            ->leftJoin('users', 'restaurants.created_by', '=', 'users.id')
+            ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
+            ->leftJoin('restaurant_reviews', 'restaurants.id', '=', 'restaurant_reviews.restaurant_id')
+            ->leftJoin('restaurant_favorites', 'restaurants.id', '=', 'restaurant_favorites.restaurant_id')
+            ->whereNull('restaurants.deleted_at')
+            ->select(
+                'users.id as user_id',
+                'users.name as user_name',
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_views.id), 0) as view_count'),
+                'restaurants.status',
+                'restaurants.verified',
+                DB::raw('COUNT(CASE WHEN restaurants.verified = 1 THEN 1 ELSE NULL END) as verified_count'),
+                DB::raw('IFNULL(COUNT(DISTINCT restaurant_reviews.id), 0) as review_count'),
+                DB::raw('COUNT(DISTINCT CASE WHEN restaurant_favorites.deleted_at IS NULL THEN restaurant_favorites.id ELSE NULL END) as favorites_count'),
+            )
+            ->where('restaurants.verified', 1)
+            ->groupBy(
+                'users.id',
+                'users.name',
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                'restaurants.status',
+                'restaurants.verified'
+            )->get();
+
+        return view('report.report_verify_restaurant', [
+            'restaurants' => $restaurant,
+            'restaurantsCount' => $restaurantsCount,
+            'verifCount' => $verifCount,
+
+        ]);
+    }
+
+    public function updateStatusForVerify($id, $userId)
+    {
+        DB::table('restaurants')
+            ->where('id', $id)
+            ->update(['verified' => 2, 'updated_by' => $userId]);
+
+        return redirect()->back()->with('success', 'verified updated successfully');
+    }
+
+    //report rsetaurant by user
+    public function getReportRestaurantForReportUser()
+    {
+        $reportCount = DB::table('restaurant_reports')
+            ->leftJoin('restaurants', 'restaurant_reports.restaurant_id', '=', 'restaurants.id')
+            ->whereNull('restaurants.deleted_at')
+            ->count();
+
+        $reportCountByRestaurant = DB::table('restaurant_reports')
+            ->leftJoin('restaurants', 'restaurant_reports.restaurant_id', '=', 'restaurants.id')
+            ->whereNull('restaurants.deleted_at')
+            ->select(
+                DB::raw('COUNT(*) as report_count')
+            )
+            ->groupBy('restaurants.id', 'restaurants.restaurant_name')
+            ->pluck('report_count');
+
+
+        $reportRestaurant = DB::table('restaurant_reports')
+            ->leftJoin('users', 'restaurant_reports.report_by', '=', 'users.id')
+            ->leftJoin('restaurants', 'restaurant_reports.restaurant_id', '=', 'restaurants.id')
+            ->whereNull('restaurants.deleted_at')
+            ->select(
+                'restaurant_reports.title as report_title',
+                'restaurant_reports.descriptions as report_description',
+                'restaurant_reports.status as report_status',
+                'users.id as user_id',
+                'users.name as user_name',
+                'restaurants.id',
+                'restaurants.restaurant_name',
+                'restaurants.address',
+                'restaurants.telephone_1',
+                'restaurants.telephone_2',
+                'restaurants.status',
+                'restaurants.verified'
+            )
+            ->distinct()
+            ->get();
+
+        return view('report.report_restaurant_by_user', [
+            'reports' => $reportRestaurant,
+            'reportCount' => $reportCount,
+            'reportCountByRestaurant' => $reportCountByRestaurant
         ]);
     }
 }

@@ -4,7 +4,7 @@
 <section class="main">
       <div class="main-top">
             <h1>จัดการข้อมูลสมาชิก</h1>
-            <i class="fas fa-user-cog"></i>
+            <p> {{ $userData['userId'] }}</p>
       </div>
       <div class="users1">
             <div class="card1">

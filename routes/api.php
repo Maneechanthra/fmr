@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\Response;
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'verifyLogin']);
 
+// Route::post('/favorites/insert', [FavoritesController::class, 'insertFavorites']);
+// Route::delete('/favorites/delete/{favorites_id}', [FavoritesController::class, 'deleteFavorites']);
+// Route::get('/favorites/my/{favorites_id}', [FavoritesController::class, 'getMyFavorites']);
+
+
 //restaurant
 // Route::get('/restaurants', [RestaurantController::class, 'getRestaurant']);
 Route::get('/restaurant/{id}', [RestaurantController::class, 'getRestaurantbyId']);

@@ -1,76 +1,45 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 
-
-// Route::get('/', function () {
-//     return view('index');
-// })->name('/');
-
-Route::get('/', [App\Http\Controllers\UserController::class, 'index'])->name('/');
-
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
-
-// login
 Route::get('/login', function () {
-    return view('login/login');
+    return view('login.login');
 })->name('login');
 
+Route::post('/verify_login', [App\Http\Controllers\UserController::class, 'verified_login_for_admin'])->name('verify_login');
 
+Route::middleware('web')->group(function () {
 
-//////////////////////// report data for report ////////////////////////
-//report users
-Route::get('/report_user', [App\Http\Controllers\UserController::class, 'reportInfoUser'])->name('report-info-user');
+    Route::get('/', [App\Http\Controllers\UserController::class, 'index'])->name('/');
 
+    //report users
+    Route::get('/report_user', [App\Http\Controllers\UserController::class, 'reportInfoUser'])->name('report-info-user');
+    Route::get('/report_restaurant',  [App\Http\Controllers\RestaurantController::class, 'getAllRestaurant'])->name('report-info-restaurant');
 
-Route::get('/report_restaurant',  [App\Http\Controllers\RestaurantController::class, 'getAllRestaurant'])->name('report-info-restaurant');
+    //verify
+    Route::get('/report-verify-restaurant',  [App\Http\Controllers\RestaurantController::class, 'getAllRestaurantForVerify'])->name('report-verify-restaurant');
+    Route::put('/update-verify/{id}/{userId}', [App\Http\Controllers\RestaurantController::class, 'updateStatusForVerify'])->name('update-verify');
 
-Route::get('/report-verify-restaurant', function () {
-    return view('report/report_verify_restaurant');
-})->name('report-verify-restaurant');
+    //report restaurant by user
+    Route::get('/report-restaurant-by-user', [App\Http\Controllers\RestaurantController::class, 'getReportRestaurantForReportUser'])->name('report-restaurant-by-user');
+    //users
+    Route::get('/user_management', [App\Http\Controllers\UserController::class, 'reportInfoUserAndAdjustStatus'])->name('user-management');
+    Route::put('/update-status/{id}', [App\Http\Controllers\UserController::class, 'updateStatus'])->name('update-status');
+    Route::delete('/delete-user/{id}', [App\Http\Controllers\UserController::class, 'deleteUser'])->name('delete-user');
 
-Route::get('/report-restaurant-by-user', function () {
-    return view('report/report_restaurant_by_user');
-})->name('report-restaurant-by-user');
+    //restaurants
+    Route::get('/restaurant_management', [App\Http\Controllers\RestaurantController::class, 'getAllRestaurantForManagement'])->name('restaurant-management');
+    Route::delete('/delete-restaurant/{id}', [App\Http\Controllers\RestaurantController::class, 'deleteRestaurantForManagement'])->name('delete-restaurant');
 
-//////////////////////// managements ////////////////////////
+    Route::get('/admin-management', function () {
+        return view('management/admin_management');
+    })->name('admin-management');
 
-Route::get('/user_management', [App\Http\Controllers\UserController::class, 'reportInfoUserAndAdjustStatus'])->name('user-management');
-Route::put('/update-status/{id}', [App\Http\Controllers\UserController::class, 'updateStatus'])->name('update-status');
-Route::delete('/delete-user/{id}', [App\Http\Controllers\UserController::class, 'deleteUser'])->name('delete-user');
+    Route::get('/update-personal', function () {
+        return view('update/update_personal');
+    })->name('update-personal');
 
-
-
-
-Route::get('/restaurant-management', function () {
-    return view('management/restaurant_management');
-})->name('restaurant-management');
-
-Route::get('/admin-management', function () {
-    return view('management/admin_management');
-})->name('admin-management');
-
-/////////////////////// update //////////////////////
-Route::get('/update-personal', function () {
-    return view('update/update_personal');
-})->name('update-personal');
-
-
-
-/////////////////////// logout //////////////////////
-Route::get('/logout', function () {
-    return view('login/login');
-})->name('logout');
-
-
-// Route::get('/admin-management', function () {
-//     return view('admin_management');
-// })->name('admin-management');
-
-// Route::get('/edit-personal', function () {
-//     return view('edit/edit_personal');
-// })->name('edit-personal');
+    Route::get('/logout', [App\Http\Controllers\UserController::class, 'logout_for_admin'])->name('logout');
+});

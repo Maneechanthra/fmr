@@ -60,7 +60,7 @@
                                     </td>
                                     <td data-label="สถานะรับรอง">
                                           @if ($restaurant->verified == 0)
-                                          ยังไม่ได้รับการยืนยัน
+                                          ยังไม่ได้รับการรับรอง
                                           @elseif ($restaurant->verified == 1)
                                           รอตรวจรอบข้อมูล
                                           @else

@@ -8,15 +8,11 @@
             <i class="fas fa-user-cog"></i>
       </div>
       <div class="users1">
-            <!-- <div class="card">
-            <img style="margin-top: 30" src="{{ asset('assets/images/user.png') }}" />
-            <h4 style="margin-top: 10; font-size: 30">จำนวนสมาชิกทั้งหมด</h4>
-            <p style="margin-top: 10; font-size: 30">จำนวน 5 คน</p>
-        </div> -->
+
             <div class="card1">
                   <img style="margin-top: 30" src="{{ asset('assets/icons/store-block.png') }}" />
                   <h4 style="margin-top: 10; font-size: 30">รายงานความไม่เหมาะสมของร้านอาหาร</h4>
-                  <p style="margin-top: 10; font-size: 30">จำนวน 4 ร้าน</p>
+                  <p style="margin-top: 10; font-size: 30">จำนวน {{ $reportCount }} ร้าน</p>
             </div>
       </div>
 
@@ -28,85 +24,45 @@
                               <tr>
                                     <th scope="col">ลำดับ</th>
                                     <th scope="col">ชื่อร้าน</th>
-                                    <th scope="col">หมายเลขโทรศัพท์ 1</th>
-                                    <th scope="col">หมายเลขโทรศัพท์ 2</th>
-                                    <th scope="col">สถานะ</th>
-                                    <th scope="col">สถานะรับรอง</th>
+                                    <th scope="col">เหตุผล</th>
+                                    <th scope="col">รายละเอียดเพิ่มเติม</th>
+                                    <th scope="col">สถานะรายงาน</th>
+                                    <th scope="col">สถานะร้านอาหาร</th>
                                     <th scope="col">จำนวนครั้งที่ถูกรายงาน</th>
                                     <th scope="col">จัดการ</th>
                               </tr>
                         </thead>
                         <tbody>
+                              @foreach ($reports as $index => $report)
                               <tr>
-                                    <td data-label="ลำดับ">01</td>
-                                    <td data-label="ชื่อร้าน">ร้านแม่หยา</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 1">042221590</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 2">042221590</td>
-                                    <td data-label="สถานะ">ปกติ</td>
+                                    <td data-label="ลำดับ">{{ $index + 1 }}</td>
+                                    <td data-label="ชื่อร้าน">{{ $report->restaurant_name}}</td>
+                                    <td data-label="เหตุผล">{{ $report->report_title}}</td>
+                                    <td data-label="รายละเอียดเพิ่มเติม">{{ $report->report_description}}</td>
+                                    <td data-label="สถานะ">
+                                          @if ($report->report_status == 0)
+                                          รอตรวจสอบ
+                                          @else
+                                          ตรวจสอบแล้ว
+                                          @endif
+                                    </td>
                                     <td data-label="สถานะรับรอง">รับรองแล้ว</td>
-                                    <td data-label="สถานะรับรอง">1/3</td>
+                                    <td data-label="สถานะรับรอง">
+                                          @if (isset($reportCountByRestaurant[$index]))
+                                          {{ $reportCountByRestaurant[$index] }}/3
+                                          @endif
+                                    </td>
                                     <td data-label="จัดการ">
-                                          <button class="button-delete">
-                                                ยกเลิกการเข้าถึงข้อมูล
-                                          </button>
+                                          @if (isset($reportCountByRestaurant[$index]) &&
+                                          $reportCountByRestaurant[$index] < 3) <button class="button-delete" disabled>
+                                                ยกเลิกการเข้าถึงข้อมูล</button>
+                                                @else
+                                                <button class="button-delete">ยกเลิกการเข้าถึงข้อมูล</button>
+                                                @endif
                                     </td>
                               </tr>
-                              <tr>
-                                    <td data-label="ลำดับ">01</td>
-                                    <td data-label="ชื่อร้าน">ร้านแม่หยา</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 1">042221590</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 2">042221590</td>
-                                    <td data-label="สถานะ">ปกติ</td>
-                                    <td data-label="สถานะรับรอง">รับรองแล้ว</td>
-                                    <td data-label="สถานะรับรอง">1/3</td>
-                                    <td data-label="จัดการ">
-                                          <button class="button-delete">
-                                                ยกเลิกการเข้าถึงข้อมูล
-                                          </button>
-                                    </td>
-                              </tr>
-                              <tr>
-                                    <td data-label="ลำดับ">01</td>
-                                    <td data-label="ชื่อร้าน">ร้านแม่หยา</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 1">042221590</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 2">042221590</td>
-                                    <td data-label="สถานะ">ปกติ</td>
-                                    <td data-label="สถานะรับรอง">รับรองแล้ว</td>
-                                    <td data-label="สถานะรับรอง">1/3</td>
-                                    <td data-label="จัดการ">
-                                          <button class="button-delete">
-                                                ยกเลิกการเข้าถึงข้อมูล
-                                          </button>
-                                    </td>
-                              </tr>
-                              <tr>
-                                    <td data-label="ลำดับ">01</td>
-                                    <td data-label="ชื่อร้าน">ร้านแม่หยา</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 1">042221590</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 2">042221590</td>
-                                    <td data-label="สถานะ">ปกติ</td>
-                                    <td data-label="สถานะรับรอง">รับรองแล้ว</td>
-                                    <td data-label="สถานะรับรอง">1/3</td>
-                                    <td data-label="จัดการ">
-                                          <button class="button-delete">
-                                                ยกเลิกการเข้าถึงข้อมูล
-                                          </button>
-                                    </td>
-                              </tr>
-                              <tr>
-                                    <td data-label="ลำดับ">01</td>
-                                    <td data-label="ชื่อร้าน">ร้านแม่หยา</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 1">042221590</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 2">042221590</td>
-                                    <td data-label="สถานะ">ปกติ</td>
-                                    <td data-label="สถานะรับรอง">รับรองแล้ว</td>
-                                    <td data-label="สถานะรับรอง">1/3</td>
-                                    <td data-label="จัดการ">
-                                          <button class="button-delete">
-                                                ยกเลิกการเข้าถึงข้อมูล
-                                          </button>
-                                    </td>
-                              </tr>
+                              @endforeach
+
                         </tbody>
                   </table>
             </div>

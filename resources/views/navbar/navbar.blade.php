@@ -3,15 +3,10 @@
             <li>
                   <a href="{{ route('/') }}" class="logo">
                         <img src="{{ asset('assets/images/logo.png') }}" />
-                        <span class="nav-item">FMR</span>
+                        <span class="nav-item">FMRestaurant</span>
                   </a>
             </li>
-            <!-- <li>
-            <a href="{{ route('dashboard') }}">
-                <i class="fas fa-menorah"></i>
-                <span class="nav-item">Dashboard</span>
-            </a>
-        </li> -->
+
 
             <li>
                   <a href="{{ route('report-info-user') }}">
@@ -64,10 +59,13 @@
                   </a>
             </li>
             <li>
-                  <a href="{{ route('logout') }}" class="logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span class="nav-item">Log out</span>
-                  </a>
+                  <form id="logout-form" action="{{ route('logout') }}" method="GET">
+                        @csrf
+                        <a href="{{ route('logout') }}" class="logout">
+                              <i class="fas fa-sign-out-alt"></i>
+                              <span class="nav-item">Log out</span>
+                        </a>
+                  </form>
             </li>
       </ul>
 </nav>

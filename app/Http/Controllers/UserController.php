@@ -188,8 +188,15 @@ class UserController extends Controller
     /// management of admin
 
     //all restaurant and user
-    public function index()
+
+
+
+    public function index(Request $request)
     {
+        $userData = $request->session()->get('user_data');
+        // $userData = $request->cookie('user_data');
+
+
         // Fetch user and restaurant information
         $information = DB::table('users')
             ->leftJoin('restaurants', 'users.id', '=', 'restaurants.created_by')
@@ -239,13 +246,19 @@ class UserController extends Controller
             )->orderBy('view_count', 'desc')
             ->get();
 
-        return view('index', [
-            'data' => $information,
-            'total_users' => $totalUsers,
-            'restaurantsCount' => $restaurantsCount,
-            'topRestaurants' => $topRestaurants,
-        ]);
+        if ($userData) {
+            return view('index', [
+                'userData' => $userData,
+                'data' => $information,
+                'total_users' => $totalUsers,
+                'restaurantsCount' => $restaurantsCount,
+                'topRestaurants' => $topRestaurants,
+            ]);
+        } else {
+            return view('login.login');
+        }
     }
+
 
     // get user information 
     public function reportInfoUser()
@@ -307,5 +320,46 @@ class UserController extends Controller
         } else {
             return response()->json(array('error' => Response::HTTP_FORBIDDEN, 'message' => null));
         }
+    }
+
+    // login user
+    public function verified_login_for_admin(Request $request)
+    {
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response(
+                ['message' => 'Invalid Credentials', 'status' => 0],
+                Response::HTTP_UNAUTHORIZED
+            );
+        }
+
+        $user = Auth::user();
+        if ($user->role !== 1) {
+            Auth::logout();
+            return response(
+                ['message' => 'Unauthorized', 'status' => 0],
+                Response::HTTP_FORBIDDEN
+            );
+        }
+
+        $token = $user->createToken('token')->plainTextToken;
+        $cookie = cookie('jwt', $token, 60 * 24);
+
+        $request->session()->put('user_data', [
+            'email' => $request->email,
+            'userId' => $user->id,
+            'jwt_token' => $token,
+            'name' => $user->name,
+            'message' => 'Login Success',
+            'status' => 1
+        ]);
+
+        return redirect('/')->withCookie($cookie);
+    }
+
+
+    public function logout_for_admin(Request $request)
+    {
+        $request->session()->forget('user_data');
+        return redirect('login');
     }
 }

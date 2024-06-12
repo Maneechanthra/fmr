@@ -13,7 +13,9 @@
 </head>
 
 <body>
-      <form action="{{ route('/') }}">
+      <form action="{{ route('verify_login') }}" method="POST">
+            @csrf
+            <!-- Add CSRF token -->
             <div class="content">
                   <div class="icon-round">
                         <img src="{{ asset('assets/icons/lock.png') }}" alt="" width="100%">
@@ -22,9 +24,11 @@
                         <h2>ลงชื่อเข้าใช้งาน</h2>
                         <div class="form-box">
                               <label>อีเมล *</label>
-                              <input style="margin-bottom: 10px;" type="text" placeholder="Username...">
+                              <input style="margin-bottom: 10px;" type="text" name="email" placeholder="Email...">
+                              <!-- Add name attribute for email -->
                               <label>รหัสผ่าน *</label>
-                              <input type="password" placeholder="Password...">
+                              <input type="password" name="password" placeholder="Password...">
+                              <!-- Add name attribute for password -->
                         </div>
                         <button type="submit">Login</button>
                   </div>
@@ -32,6 +36,7 @@
                   <div class="text-footer"><a href="#">ลืมรหัสผ่าน?</a></div>
             </div>
       </form>
+
 
 </body>
 
