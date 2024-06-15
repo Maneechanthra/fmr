@@ -4,7 +4,9 @@
 <section class="main">
       <div class="main-top">
             <h1>จัดการข้อมูลสมาชิก</h1>
-
+            <i class="fas fa-user">
+                  {{ $userData->name }} || {{ $userData->email }}
+            </i>
       </div>
 
       <section class="attendance">
@@ -36,24 +38,18 @@
 
                                     </td>
                                     <td>
-                                          <form id="adjust-form-{{ $userInfo->user_id }}"
-                                                action="{{ route('update-status', ['id' => $userInfo->user_id]) }}"
-                                                method="POST">
+                                          <form id="adjust-form-{{ $userInfo->user_id }}" action="{{ route('update-status', ['id' => $userInfo->user_id]) }}" method="POST">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="button" class="button-status"
-                                                      onclick="confirmAdjust('{{ $userInfo->user_id }}')">ปรับสถานะ</button>
+                                                <button type="button" class="button-status" onclick="confirmAdjust('{{ $userInfo->user_id }}')">ปรับสถานะ</button>
                                           </form>
                                     </td>
 
                                     <td>
-                                          <form id="delete-form-{{ $userInfo->user_id }}"
-                                                action="{{ route('delete-user', ['id' => $userInfo->user_id]) }}"
-                                                method="POST">
+                                          <form id="delete-form-{{ $userInfo->user_id }}" action="{{ route('delete-user', ['id' => $userInfo->user_id]) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" class="button-delete"
-                                                      onclick="confirmDelete('{{ $userInfo->user_id }}')">ลบข้อมูล</button>
+                                                <button type="button" class="button-delete" onclick="confirmDelete('{{ $userInfo->user_id }}')">ลบข้อมูล</button>
                                           </form>
                                     </td>
 
@@ -71,43 +67,43 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-function confirmDelete(userId) {
-      Swal.fire({
-            title: 'คุณแน่ใจหรือไม่?',
-            text: "คุณต้องการลบผู้ใช้นี้หรือไม่?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'ใช่, ลบเลย!',
-            cancelButtonText: 'ยกเลิก'
-      }).then((result) => {
-            if (result.isConfirmed) {
-                  document.getElementById('delete-form-' + userId).submit();
-            }
-      });
+      function confirmDelete(userId) {
+            Swal.fire({
+                  title: 'คุณแน่ใจหรือไม่?',
+                  text: "คุณต้องการลบผู้ใช้นี้หรือไม่?",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'ใช่, ลบเลย!',
+                  cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                  if (result.isConfirmed) {
+                        document.getElementById('delete-form-' + userId).submit();
+                  }
+            });
 
 
-}
+      }
 </script>
 
 <script>
-function confirmAdjust(userId) {
-      Swal.fire({
-            title: 'คุณแน่ใจหรือไม่?',
-            text: "คุณต้องการปรับสถานะผู้ใช้นี้หรือไม่?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'ใช่, แน่นอน!',
-            cancelButtonText: 'ยกเลิก'
-      }).then((result) => {
-            if (result.isConfirmed) {
-                  document.getElementById('adjust-form-' + userId).submit();
-            }
-      });
-}
+      function confirmAdjust(userId) {
+            Swal.fire({
+                  title: 'คุณแน่ใจหรือไม่?',
+                  text: "คุณต้องการปรับสถานะผู้ใช้นี้หรือไม่?",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'ใช่, แน่นอน!',
+                  cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                  if (result.isConfirmed) {
+                        document.getElementById('adjust-form-' + userId).submit();
+                  }
+            });
+      }
 </script>
 
 @endsection

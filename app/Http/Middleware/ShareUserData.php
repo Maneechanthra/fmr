@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ShareUserData
 {
@@ -16,10 +17,12 @@ class ShareUserData
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->session()->has('user_data')) {
-            $userData = $request->session()->get('user_data');
+        // Check if user is authenticated
+        if (Auth::check()) {
+            $userData = Auth::user();
             view()->share('userData', $userData);
         }
+
         return $next($request);
     }
 }

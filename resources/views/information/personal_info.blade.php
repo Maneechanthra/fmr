@@ -13,17 +13,9 @@
 
                               @csrf
                               <div class="form-group">
-                                    <p>ชื่อ-นามสกุล: {{ $userData['name'] }}</p>
-                                    <!-- <label for="email">อีเมล *</label>
-                                    <input id="email" name="email" type="email" required> -->
+                                    <h1>Welcome, {{ $userData->name }}</h1>
+                                    <p>Email: {{ $userData->email }}</p>
                               </div>
-                              <div class="form-group">
-                                    <p>อีเมล: {{ $userData['email'] }}</p>
-                                    <!-- <label for="password">รหัสผ่าน *</label>
-                                    <input id="password" name="password" type="password" placeholder="Password..." required> -->
-                              </div>
-                              <button type="submit">บันทึกการเปลี่ยนแปลง</button>
-
                         </div>
                   </div>
             </div>

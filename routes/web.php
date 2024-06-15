@@ -49,6 +49,8 @@ Route::middleware('isLoggedIn')->group(function () {
       //admin
       Route::get('/admin-management', [App\Http\Controllers\dashboard\UserController::class, 'getAdmin'])->name('admin-management');
 
+      // Route::get('/personal-info', [App\Http\Controllers\dashboard\UserController::class, 'profileUser'])->name('personal-info');
+
       Route::get('/personal-info', function () {
             return view('information/personal_info');
       })->name('personal-info');

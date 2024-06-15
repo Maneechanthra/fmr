@@ -4,11 +4,9 @@
 <section class="main">
       <div class="main-top">
             <h1>FMRestaurant</h1>
-            @if ($userData)
-            <p>{{ $userData['name'] }}</p>
-            @else
-            <p>No user data available</p>
-            @endif
+            <i class="fas fa-user">
+                  {{ $userData->name }} || {{ $userData->email }}
+            </i>
       </div>
       <div class="users1">
             <div class="card1">

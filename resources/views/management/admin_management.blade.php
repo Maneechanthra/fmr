@@ -4,6 +4,9 @@
 <section class="main">
       <div class="main-top">
             <h1>จัดการข้อมูลสมาชิก</h1>
+            <i class="fas fa-user">
+                  {{ $userData->name }} || {{ $userData->email }}
+            </i>
       </div>
 
       <section class="attendance">
@@ -32,9 +35,9 @@
                                           @endif
                                     </td>
                                     <td data-label="ลบ">
-                                          @if ($admin->role == 1 && $admin->updated_at > $admin->created_at)
-                                          <button class="button-delete">ลบข้อมูล</button>
-                                          @endif
+                                          @if ($admin->role == 1 && $userData->updated_at < $admin->created_at)
+                                                <button class="button-delete">ลบข้อมูล</button>
+                                                @endif
                                     </td>
 
                               </tr>

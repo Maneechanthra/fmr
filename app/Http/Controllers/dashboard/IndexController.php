@@ -6,18 +6,24 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use App\Models\User;
 
 class IndexController extends Controller
 {
     //
 
+    //===============================================================================================
+    //=================================== successs fuinction ========================================
     public function index(Request $request)
     {
-        $userData = $request->session()->get('user_data');
+        if (!Session::has('loginId')) {
+            return redirect()->route('login');
+        }
 
-        // if (!$userData) {
-        //     return redirect()->route('login');
-        // }
+        $userData = User::find(Session::get('loginId'));
+
+
 
         $information = DB::table('users')
             ->leftJoin('restaurants', 'users.id', '=', 'restaurants.created_by')
@@ -32,7 +38,6 @@ class IndexController extends Controller
                 'restaurants.restaurant_name as restaurant_name'
             )
             ->get();
-
 
         $totalUsers = DB::table('users')->whereNull('deleted_at')->count();
 
@@ -53,7 +58,7 @@ class IndexController extends Controller
                 'restaurants.status',
                 'restaurants.verified',
                 DB::raw('IFNULL(COUNT(DISTINCT restaurant_reviews.id), 0) as review_count'),
-                DB::raw('COUNT(DISTINCT CASE WHEN restaurant_favorites.deleted_at IS NULL THEN restaurant_favorites.id ELSE NULL END) as favorites_count'),
+                DB::raw('COUNT(DISTINCT CASE WHEN restaurant_favorites.deleted_at IS NULL THEN restaurant_favorites.id ELSE NULL END) as favorites_count')
             )
             ->groupBy(
                 'restaurants.id',
@@ -63,7 +68,8 @@ class IndexController extends Controller
                 'restaurants.telephone_2',
                 'restaurants.status',
                 'restaurants.verified'
-            )->orderBy('view_count', 'desc')
+            )
+            ->orderBy('view_count', 'desc')
             ->get();
 
         return view('index', [
@@ -74,4 +80,7 @@ class IndexController extends Controller
             'topRestaurants' => $topRestaurants,
         ]);
     }
+    //=================================== end successs fuinction ========================================
+    //===================================================================================================
+
 }

@@ -4,7 +4,9 @@
 <section class="main">
       <div class="main-top">
             <h1>จัดการข้อมูลร้านอาหาร</h1>
-            <i class="fas fa-user-cog"></i>
+            <i class="fas fa-user">
+                  {{ $userData->name }} || {{ $userData->email }}
+            </i>
       </div>
 
       <section class="attendance">

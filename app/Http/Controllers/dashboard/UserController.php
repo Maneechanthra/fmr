@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
+use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 
@@ -85,5 +86,16 @@ class UserController extends Controller
         return view('management.admin_management', [
             'dataAdmin' => $admin,
         ]);
+    }
+
+    public function profileUser()
+    {
+        if (!Session::has('loginId')) {
+            return redirect()->route('login');
+        }
+
+        $userData = User::find(Session::get('loginId'));
+
+        return redirect()->route('personal-info')->with('userData', $userData);
     }
 }

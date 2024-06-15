@@ -5,7 +5,9 @@
 <section class="main">
       <div class="main-top">
             <h1>FMRestaurant</h1>
-            <i class="fas fa-user-cog"></i>
+            <i class="fas fa-user">
+                  {{ $userData->name }} || {{ $userData->email }}
+            </i>
       </div>
       <div class="users1">
             <div class="card1">
@@ -56,16 +58,12 @@
                                           @endif
                                     </td>
                                     <td data-label="จัดการ">
-                                          @if ($restaurantData['reportCount'] < 3) <button class="button-delete"
-                                                disabled>ยกเลิกการเข้าถึงข้อมูล</button>
+                                          @if ($restaurantData['reportCount'] < 3) <button class="button-delete" disabled>ยกเลิกการเข้าถึงข้อมูล</button>
                                                 @else
-                                                <form id="updated-status-restaurant-{{ $restaurantId }}"
-                                                      action="{{ route('update-status-restaurant', ['id' => $restaurantId, 'userId' => $userData['userId']]) }}"
-                                                      method="POST">
+                                                <form id="updated-status-restaurant-{{ $restaurantId }}" action="{{ route('update-status-restaurant', ['id' => $restaurantId, 'userId' => $userData['userId']]) }}" method="POST">
                                                       @csrf
                                                       @method('PUT')
-                                                      <button type="button" class="button-delete"
-                                                            onclick="updatedStatus('{{ $restaurantId }}')">ยกเลิกการเข้าถึงข้อมูล</button>
+                                                      <button type="button" class="button-delete" onclick="updatedStatus('{{ $restaurantId }}')">ยกเลิกการเข้าถึงข้อมูล</button>
                                                 </form>
                                                 @endif
                                     </td>
@@ -81,23 +79,23 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
-function updatedStatus(id) {
-      console.log(id);
-      Swal.fire({
-            title: 'คุณแน่ใจหรือไม่?',
-            text: "คุณต้องการปรับสถานะผู้ใช้นี้หรือไม่?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'ใช่, แน่นอน!',
-            cancelButtonText: 'ยกเลิก'
-      }).then((result) => {
-            if (result.isConfirmed) {
-                  document.getElementById('updated-status-restaurant-' + id).submit();
-            }
-      });
-}
+      function updatedStatus(id) {
+            console.log(id);
+            Swal.fire({
+                  title: 'คุณแน่ใจหรือไม่?',
+                  text: "คุณต้องการปรับสถานะผู้ใช้นี้หรือไม่?",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'ใช่, แน่นอน!',
+                  cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                  if (result.isConfirmed) {
+                        document.getElementById('updated-status-restaurant-' + id).submit();
+                  }
+            });
+      }
 </script>
 
 @endsection

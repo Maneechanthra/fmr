@@ -4,6 +4,9 @@
 <section class="main">
       <div class="main-top">
             <h1>FMRestaurant</h1>
+            <i class="fas fa-user">
+                  {{ $userData->name }} || {{ $userData->email }}
+            </i>
 
       </div>
       <div class="users">
