@@ -59,13 +59,13 @@ nav .fas{
   position: relative;
   width: 70px;
   height: 40px;
-  top: 20px;
+  top: 12px;
   font-size: 20px;
   text-align: center;
 }
 .nav-item{
   position: relative;
-  top: 12px;
+  top: 10px;
   margin-left: 10px;
 }
 a:hover{
@@ -363,6 +363,47 @@ form .input-box span.details{
   background: linear-gradient(-135deg, #71b7e6, #9b59b6);
   }
 
+  .prompt-box {
+    background-color: #fafafa;
+    /* border: 1px solid #ffffff; */
+    border-radius: 20px;
+    padding: 20px;
+    width: 350px;
+    margin: auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+/* .prompt-box input[type="text"] {
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    margin-bottom: 10px;
+} */
+ .reason{
+  margin-top: 10px;
+  width: 300px;
+  height: 200px;
+  padding: 10px;
+  border-radius: 10px;
+ }
+
+.prompt-box button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.prompt-box button:hover {
+    background-color: #45a049;
+}
+
   @media screen and (max-width: 700px) {
     table {
       border: 0;
@@ -409,6 +450,9 @@ form .input-box span.details{
       border-bottom: 0;
     }
   }
+
+
+
  @media(max-width: 584px){
  .container{
   max-width: 100%;

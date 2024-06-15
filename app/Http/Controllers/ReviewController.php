@@ -128,7 +128,7 @@ class ReviewController extends Controller
                 'users.id as userId',
                 'restaurant_reviews.created_at'
             )
-            ->join('users', 'users.id', '=', 'restaurant_reviews.review_by')
+            ->leftjoin('users', 'users.id', '=', 'restaurant_reviews.review_by')
             ->where('restaurant_id', $restaurant_id)
             ->whereNull('restaurant_reviews.deleted_at')
             ->get();

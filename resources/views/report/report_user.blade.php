@@ -3,8 +3,12 @@
 @section('content')
 <section class="main">
       <div class="main-top">
-            <h1>จัดการข้อมูลสมาชิก</h1>
-            <p> {{ $userData['userId'] }}</p>
+            <h1>FMRestaurant</h1>
+            @if ($userData)
+            <p>{{ $userData['name'] }}</p>
+            @else
+            <p>No user data available</p>
+            @endif
       </div>
       <div class="users1">
             <div class="card1">
@@ -21,7 +25,7 @@
 
       <section class="attendance">
             <div class="attendance-list">
-                  <h1 style="margin-bottom: 10px;">จัดการข้อมูลสมาชิก</h1>
+                  <h1 style="margin-bottom: 10px;">รายงานข้อมูลสมาชิก</h1>
                   <table id="data-table" style="width:100%; padding-top: 10px;">
                         <thead>
                               <tr>
@@ -48,8 +52,6 @@
 
                               </tr>
                               @endforeach
-
-
                         </tbody>
                   </table>
             </div>

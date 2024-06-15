@@ -4,15 +4,10 @@
 
 <section class="main">
       <div class="main-top">
-            <h1>FMRestaurant</h1>
+            <h1>รายงานข้อมูลร้านอาหาร</h1>
             <i class="fas fa-user-cog"></i>
       </div>
       <div class="users1">
-            <!-- <div class="card">
-            <img style="margin-top: 30" src="{{ asset('assets/images/user.png') }}" />
-            <h4 style="margin-top: 10; font-size: 30">จำนวนสมาชิกทั้งหมด</h4>
-            <p style="margin-top: 10; font-size: 30">จำนวน 5 คน</p>
-        </div> -->
             <div class="card1">
                   <img style="margin-top: 30" src="{{ asset('assets/images/restaurant.png') }}" />
                   <h4 style="margin-top: 10; font-size: 30">จำนวนร้านอาหารทั้งหมด</h4>

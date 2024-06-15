@@ -10,7 +10,7 @@
 
             <li>
                   <a href="{{ route('report-info-user') }}">
-                        <i class="fas fa-id-card"></i>
+                        <i class="fas fa-users"></i>
                         <span class="nav-item">รายงานสมาชิก</span>
                   </a>
             </li>
@@ -22,7 +22,7 @@
             </li>
             <li>
                   <a href="{{ route('user-management') }}">
-                        <i class="fas fa-user-cog"></i>
+                        <i class="fas fa-users-cog"></i>
                         <span class="nav-item">จัดการข้อมูลสมาชิก</span>
                   </a>
             </li>
@@ -48,18 +48,19 @@
 
             <li>
                   <a href="{{ route('admin-management') }}">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user-cog"></i>
                         <span class="nav-item">จัดการข้อมูลผู้ดูแลระบบ</span>
                   </a>
             </li>
             <li>
-                  <a href="{{ route('update-personal') }}">
-                        <i class="fas fa-user-edit"></i>
-                        <span class="nav-item">แก้ไขข้อมูลส่วนตัว</span>
+                  <a href="{{ route('personal-info') }}">
+                        <i class="fas fa-user-tie"></i>
+                        <span class="nav-item">ข้อมูลส่วนตัว</span>
                   </a>
             </li>
+
             <li>
-                  <form id="logout-form" action="{{ route('logout') }}" method="GET">
+                  <form action="{{ route('logout') }}" method="GET">
                         @csrf
                         <a href="{{ route('logout') }}" class="logout">
                               <i class="fas fa-sign-out-alt"></i>

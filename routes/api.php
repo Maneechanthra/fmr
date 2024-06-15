@@ -17,28 +17,19 @@ use Illuminate\Support\Facades\Response;
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'verifyLogin']);
 
-// Route::post('/favorites/insert', [FavoritesController::class, 'insertFavorites']);
-// Route::delete('/favorites/delete/{favorites_id}', [FavoritesController::class, 'deleteFavorites']);
-// Route::get('/favorites/my/{favorites_id}', [FavoritesController::class, 'getMyFavorites']);
-
-
 //restaurant
-// Route::get('/restaurants', [RestaurantController::class, 'getRestaurant']);
 Route::get('/restaurant/{id}', [RestaurantController::class, 'getRestaurantbyId']);
 Route::get('/restaurants/search/name', [RestaurantController::class, 'getRestaurantsSearchByName']);
 Route::get('/restaurants/map', [RestaurantController::class, 'getRestaurantForMap']);
-
 
 //recommended
 Route::get('/recommended', [RecommendedController::class, 'getRecommended']);
 
 //view
 Route::post('/view/insert', [ViewsController::class, 'insertView']);
-
 Route::get('/reviews/{id}', [ReviewController::class, 'getReviewByrestaurant']);
-// Route::get('/test', [ReviewController::class, 'aa']);
 
-//apiImages
+//api images restaurants
 Route::get('/img', [Controller::class, 'sentimg']);
 Route::get('/public/restaurants/{file_name}', function ($filename) {
     $path = storage_path('app/public/restaurants/' . $filename);
@@ -70,8 +61,13 @@ Route::get('/public/reviews/{file_name}', function ($filename) {
 Route::post('/category/insert', [Categories::class, 'insertCategory']);
 Route::get('/categories', [Categories::class, 'getCategory']);
 
-
 Route::get('/favorites/checkFavorites/{userId}/{restaurantId}', [FavoritesController::class, 'checkFavorite']);
+Route::post('/restaurant/insertOpenings/{restaurantId}', [RestaurantController::class, 'insertOpenings']);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////  middleware auth scantum  ///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Route::middleware('auth:sanctum')->group(function () {
     //user
@@ -84,17 +80,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/{userId}', [ReportsController::class, 'getReportByuserId']);
     Route::post('/user/changePassword/{userId}', [UserController::class, 'changePassword']);
 
-
     //favorites
     Route::post('/favorites/insert', [FavoritesController::class, 'insertFavorites']);
     Route::delete('/favorites/delete/{favorites_id}', [FavoritesController::class, 'deleteFavorites']);
     Route::get('/favorites/my/{favorites_id}', [FavoritesController::class, 'getMyFavorites']);
 
-
     //review
     Route::post('/review/insert', [ReviewController::class, 'insertReview']);
     Route::post('/review/insert/insertImages/{review_id}', [ReviewController::class, 'insertReviewImage']);
-
     Route::post('/review/update', [ReviewController::class, 'updateReview']);
     Route::delete('/review/delete/{review_id}', [ReviewController::class, 'deleteReview']);
 
@@ -105,7 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //insert restaurant
     Route::post('/restaurant/insert', [RestaurantController::class, 'createRestaurant']);
     Route::post('/restaurant/insertCategories/{restaurantId}', [RestaurantController::class, 'insertCategories']);
-    Route::post('/restaurant/insertOpenings/{restaurantId}', [RestaurantController::class, 'insertOpenings']);
+    // Route::post('/restaurant/insertOpenings/{restaurantId}', [RestaurantController::class, 'insertOpenings']);
     Route::post('/restaurant/insertImages/{restaurantId}', [RestaurantController::class, 'insertImages']);
     Route::delete('/restaurant/delete/{restaurant_id}', [RestaurantController::class, 'deleteRestaurant']);
     Route::get('/restaurant/myrestaurant/{userId}', [RestaurantController::class, 'getMyRestaurants']);
@@ -117,7 +110,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/restaurant/updateCategories/{restaurantId}', [RestaurantController::class, 'updateCategories']);
 
     //verify 
-    // Route::post('/verified/insert', [RestaurantController::class, 'verifiedRestaurant']);
     Route::post('/verified/insert/{restaurantId}', [RestaurantController::class, 'verifiedRestaurant']);
     Route::post('/verified/insertImages/{restaurantId}', [RestaurantController::class, 'insertImagesForVerified']);
 });
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

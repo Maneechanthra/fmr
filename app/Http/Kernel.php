@@ -37,8 +37,6 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ShareUserData::class,
-            // \App\Http\Middleware\ClearUserDataOnLogout::class,
-            // \App\Http\Middleware\AuthenticateMiddleware::class,
         ],
 
         'api' => [
@@ -46,6 +44,11 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
+    ];
+
+    protected $routeMiddleware = [
+        'isLoggedIn' => \App\Http\Middleware\AuthCheck::class,
+        'alreadyLoggedIn' => \App\Http\Middleware\AlreadyLoggedIn::class,
     ];
 
     /**

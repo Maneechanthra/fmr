@@ -4,7 +4,7 @@
 <section class="main">
       <div class="main-top">
             <h1>FMRestaurant</h1>
-            <p> {{ $userData['name'] }}</p>
+
       </div>
       <div class="users">
             <div class="card">
