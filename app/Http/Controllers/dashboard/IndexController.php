@@ -23,8 +23,6 @@ class IndexController extends Controller
 
         $userData = User::find(Session::get('loginId'));
 
-
-
         $information = DB::table('users')
             ->leftJoin('restaurants', 'users.id', '=', 'restaurants.created_by')
             ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')

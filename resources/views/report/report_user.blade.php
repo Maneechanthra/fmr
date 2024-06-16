@@ -3,7 +3,7 @@
 @section('content')
 <section class="main">
       <div class="main-top">
-            <h1>FMRestaurant</h1>
+            <h1>รายงานข้อมูลสมาชิก</h1>
             <i class="fas fa-user">
                   {{ $userData->name }} || {{ $userData->email }}
             </i>

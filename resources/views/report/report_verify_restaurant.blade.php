@@ -67,14 +67,14 @@
 
 
                                     <td>
-                                          <form id="adjust-form-{{ $restaurant->id }}" action="{{ route('update-verify', ['id' => $restaurant->id, 'userId' => $userData['userId']]) }}" method="POST">
+                                          <form id="adjust-form-{{ $restaurant->id }}" action="{{ route('update-verify', ['id' => $restaurant->id, 'userId' => $userData->id]) }}" method="POST">
                                                 @csrf
                                                 @method('PUT')
                                                 <button type="button" class="button-status" onclick="confirmAdjust('{{ $restaurant->id }}')">ยืนยัน</button>
                                           </form>
 
 
-                                          <form id="adjust-form-{{ $restaurant->id }}" action="{{ route('reject-verify', ['id' => $restaurant->id, 'userId' => $userData['userId']]) }}" method="POST">
+                                          <form id="adjust-form-{{ $restaurant->id }}" action="{{ route('reject-verify', ['id' => $restaurant->id, 'userId' => $userData->id]) }}" method="POST">
                                                 @csrf
                                                 @method('PUT')
                                                 <button type="button" class="button-delete" onclick="rejectAdjus('{{ $restaurant->id }}')">ปฏิเสธ</button>
@@ -120,7 +120,7 @@
         <h4>กรุณากรอกเหตุผลที่ปฏิเสธ:</h4>
         <input class="reason" type="text" id="reject-reason" />
         <input type="hidden" id="restaurant-id" value="${restaurantId}" />
-        <input type="hidden" id="user-id" value="{{ $userData['userId'] }}" />
+        <input type="hidden" id="user-id" value="{{ $userData->id }}" />
         <button onclick="submitReject()">ตกลง</button>
         <button onclick="closePrompt()">ยกเลิก</button>
     `;
@@ -138,7 +138,7 @@
                   var restaurantId = restaurantIdElement.value;
                   var userId = userIdElement.value;
 
-                  console.log(reason, restaurantId, userId);
+                  console.log("เหตุผล: " + reason, "restaurant_id: " + restaurantId, " || userId: " + userId);
 
                   if (reason.trim() !== "") {
                         // ใช้ SweetAlert สำหรับการยืนยัน

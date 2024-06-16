@@ -15,6 +15,10 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
+
 
 class AuthController extends Controller
 {
@@ -113,5 +117,52 @@ class AuthController extends Controller
             Session::pull('userData');
         }
         return redirect('login');
+    }
+
+    //===========================================================================
+    //===========================================================================
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => __($status)], 200)
+            : response()->json(['message' => __($status)], 400);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                // Optional: You can dispatch an event or notification here upon successful password reset.
+                // event(new PasswordReset($user));
+            }
+        );
+
+        // Check if the password was successfully reset
+        if ($status === Password::PASSWORD_RESET) {
+            // Redirect or return a success response
+            return response()->json(['message' => 'Password reset successfully'], 200);
+        } else {
+            // Redirect or return an error response
+            return response()->json(['message' => 'Failed to reset password'], 400);
+        }
     }
 }

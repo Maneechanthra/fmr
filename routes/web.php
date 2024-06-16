@@ -57,6 +57,9 @@ Route::middleware('isLoggedIn')->group(function () {
 });
 
 
+Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('reset-password');
+
 // Route::get('/login', function () {
 //       return view('login.login');
 // })->name('login');

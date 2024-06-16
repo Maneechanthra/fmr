@@ -13,6 +13,14 @@ use App\Http\Controllers\ViewsController;
 use App\Http\Controllers\RecommendedController;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\dashboard\AuthController;
+
+//================================================
+
+Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('reset-password', [AuthController::class, 'resetPassword']);
+
+//================================================
 
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'verifyLogin']);
