@@ -40,4 +40,15 @@ class Controller extends BaseController
 
         return null;
     }
+
+    private function storeImageVerified($image)
+    {
+        if ($image) {
+            $imageName = Str::uuid() . '.' . $image->getClientOriginalExtension();
+            $image->storeAs('public/verified', $imageName);
+            return $imageName;
+        }
+
+        return null;
+    }
 }

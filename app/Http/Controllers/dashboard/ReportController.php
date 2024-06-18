@@ -13,7 +13,9 @@ class ReportController extends Controller
         $reportCount = DB::table('restaurant_reports')
             ->leftJoin('restaurants', 'restaurant_reports.restaurant_id', '=', 'restaurants.id')
             ->whereNull('restaurants.deleted_at')
-            ->count();
+            ->distinct('restaurant_reports.restaurant_id')
+            ->count('restaurant_reports.restaurant_id');
+
 
         $reportCountByRestaurant = DB::table('restaurant_reports')
             ->leftJoin('restaurants', 'restaurant_reports.restaurant_id', '=', 'restaurants.id')

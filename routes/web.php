@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\dashboard\AuthController;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\Controller;
+
 
 Route::get('/', function () {
       return view('login.login');
@@ -19,8 +23,25 @@ Route::controller(AuthController::class)->group(function () {
       Route::get('/logout', 'logout');
 });
 
-// Route::get('/', [App\Http\Controllers\dashboard\IndexController::class, 'index'])->name('/')->middleware('isLoggedIn');
+///===================================================================================================
+//images for website map
+// Route::get('/storage/images/verified/{file_name}', function ($filename) {
+//       $path = storage_path('app/public/verified/' . $filename);
+//       if (!File::exists($path)) {
+//             abort(404);
+//       }
+//       $file = File::get($path);
+//       $type = File::mimeType($path);
+//       $response = Response::make($file, 200);
+//       $response->header("Content-Type", $type);
+//       return $response;
+// });
 
+
+
+///===================================================================================================
+
+// Route::get('/', [App\Http\Controllers\dashboard\IndexController::class, 'index'])->name('/')->middleware('isLoggedIn');
 Route::middleware('isLoggedIn')->group(function () {
 
       Route::get('/', [App\Http\Controllers\dashboard\IndexController::class, 'index'])->name('/');
@@ -54,6 +75,34 @@ Route::middleware('isLoggedIn')->group(function () {
       Route::get('/personal-info', function () {
             return view('information/personal_info');
       })->name('personal-info');
+
+
+      // Route::get('/images_verified', [Controller::class, 'sentimgReview']);
+      // Route::get('/public/{file_name}', function ($filename) {
+      //       $path = storage_path('app/public/verified' . $filename);
+      //       if (!File::exists($path)) {
+      //             abort(404);
+      //       }
+      //       $file = File::get($path);
+      //       $type = File::mimeType($path);
+      //       $response = Response::make($file, 200);
+      //       $response->header("Content-Type", $type);
+      //       return $response;
+      // })->name('verified-images');
+
+      //api image reviews 
+      Route::get('/images_verified', [Controller::class, 'sentimgReview']);
+      Route::get('/public/verified/{file_name}', function ($filename) {
+            $path = storage_path('app/public/' . $filename);
+            if (!File::exists($path)) {
+                  abort(404);
+            }
+            $file = File::get($path);
+            $type = File::mimeType($path);
+            $response = Response::make($file, 200);
+            $response->header("Content-Type", $type);
+            return $response;
+      });
 });
 
 

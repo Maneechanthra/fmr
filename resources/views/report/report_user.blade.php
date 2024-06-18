@@ -34,8 +34,8 @@
 
                               </tr>
                         </thead>
+                        @foreach ($data as $index => $users)
                         <tbody>
-                              @foreach ($data as $index => $users)
                               <tr>
                                     <td data-label="ลำดับ">{{ $index + 1 }}</td>
                                     <td data-label="ชื่อ-นามกุล">{{ $users->user_name }}</td>
@@ -49,10 +49,11 @@
                                     </td>
 
                               </tr>
-                              @endforeach
                         </tbody>
+                        @endforeach
                   </table>
             </div>
       </section>
 </section>
+
 @endsection

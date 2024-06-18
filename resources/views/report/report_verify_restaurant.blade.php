@@ -31,6 +31,7 @@
                                     <th scope="col">ลำดับ</th>
                                     <th scope="col">ชื่อร้าน</th>
                                     <th scope="col">ผู้ส่งคำร้อง</th>
+                                    <th scope="col">รูปภาพ</th>
                                     <th scope="col">หมายเลขโทรศัพท์ 1</th>
                                     <th scope="col">หมายเลขโทรศัพท์ 2</th>
                                     <th scope="col">สถานะ</th>
@@ -46,8 +47,33 @@
                                     <td data-label="ลำดับ">{{ $index + 1}}</td>
                                     <td data-label="ชื่อร้าน">{{ $restaurant-> restaurant_name}}</td>
                                     <td data-label="ผู้ส่งคำร้อง">{{ $restaurant-> user_name}}</td>
+
+                                    <td data-label="รูปภาพ">
+                                          @foreach($restaurant->image_paths as $image_path)
+                                          <img src="{{ url('/public/verified/' . $image_path) }}" alt="Restaurant Image" style="max-width: 100px; max-height: 100px; margin-right: 10px;">
+                                          @endforeach
+                                    </td>
+
+
+                                    <td data-label="รูปภาพ">
+                                          @foreach($restaurant->image_paths as $image_path)
+                                          <img src="{{ asset('storage/' . $image_path) }}" alt="Restaurant Image" style="max-width: 100px; max-height: 100px; margin-right: 10px;">
+
+                                          @endforeach
+                                    </td>
+
+                                    <td data-label="รูปภาพ">
+                                          @foreach($restaurant->image_paths as $image_path)
+                                          <img src="{{ url('storage/' . $image_path) }}" alt="Restaurant Image" style="max-width: 100px; max-height: 100px; margin-right: 10px;">
+                                          @endforeach
+                                    </td>
+
+
+
+
                                     <td data-label="หมายเลขโทรศัพท์ 1">{{ $restaurant-> telephone_1}}</td>
-                                    <td data-label="หมายเลขโทรศัพท์ 2">{{ $restaurant-> telephone_2}}</td>
+                                    <td data-label=" หมายเลขโทรศัพท์ 2">{{ $restaurant-> telephone_2}}
+                                    </td>
                                     <td data-label="สถานะ">
                                           @if ($restaurant->status == 1)
                                           ปกติ
@@ -98,11 +124,11 @@
       function confirmAdjust(id) {
             Swal.fire({
                   title: 'คุณแน่ใจหรือไม่?',
-                  text: "คุณต้องการปรับสถานะผู้ใช้นี้หรือไม่?",
+                  text: "คุณต้องการปรับสถานะรับรองร้านอาหารใช่หรือไม่?",
                   icon: 'warning',
                   showCancelButton: true,
-                  confirmButtonColor: '#d33',
-                  cancelButtonColor: '#3085d6',
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
                   confirmButtonText: 'ใช่, แน่นอน!',
                   cancelButtonText: 'ยกเลิก'
             }).then((result) => {
@@ -141,7 +167,6 @@
                   console.log("เหตุผล: " + reason, "restaurant_id: " + restaurantId, " || userId: " + userId);
 
                   if (reason.trim() !== "") {
-                        // ใช้ SweetAlert สำหรับการยืนยัน
                         Swal.fire({
                               title: 'คุณแน่ใจหรือไม่?',
                               text: "คุณต้องการที่จะปฏิเสธร้านอาหารนี้หรือไม่?",

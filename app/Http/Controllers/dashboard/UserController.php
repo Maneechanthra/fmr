@@ -81,6 +81,7 @@ class UserController extends Controller
     {
         $admin = DB::table('users')
             ->where('role', '=', 1)
+            ->whereNull('users.deleted_at')
             ->get();
 
         return view('management.admin_management', [

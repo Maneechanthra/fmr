@@ -150,18 +150,12 @@ class AuthController extends Controller
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();
-
-                // Optional: You can dispatch an event or notification here upon successful password reset.
-                // event(new PasswordReset($user));
             }
         );
 
-        // Check if the password was successfully reset
         if ($status === Password::PASSWORD_RESET) {
-            // Redirect or return a success response
             return response()->json(['message' => 'Password reset successfully'], 200);
         } else {
-            // Redirect or return an error response
             return response()->json(['message' => 'Failed to reset password'], 400);
         }
     }

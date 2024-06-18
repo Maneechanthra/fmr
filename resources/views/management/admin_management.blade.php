@@ -34,12 +34,17 @@
                                           แอดมิน
                                           @endif
                                     </td>
-                                    <td data-label="ลบ">
-                                          @if ($admin->role == 1 && $userData->updated_at < $admin->created_at)
-                                                <button class="button-delete">ลบข้อมูล</button>
-                                                @endif
-                                    </td>
 
+
+                                    <td>
+                                          <form id="delete-form-{{ $admin->id }}" action="{{ route('delete-user', ['id' => $admin->id]) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                @if ($admin->role == 1 && $userData->updated_at < $admin->created_at)
+                                                      <button type="button" class="button-delete" onclick="confirmDelete('{{ $admin->id }}')">ลบข้อมูล</button>
+                                                      @endif
+                                          </form>
+                                    </td>
                               </tr>
                               @endforeach
 
@@ -49,4 +54,26 @@
             </div>
       </section>
 </section>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+      function confirmDelete(userId) {
+            Swal.fire({
+                  title: 'คุณแน่ใจหรือไม่?',
+                  text: "คุณต้องการลบผู้ใช้นี้หรือไม่?",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'ใช่, ลบเลย!',
+                  cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                  if (result.isConfirmed) {
+                        document.getElementById('delete-form-' + userId).submit();
+                  }
+            });
+
+
+      }
+</script>
+
 @endsection

@@ -27,7 +27,7 @@
       <section class="attendance">
             <div class="attendance-list">
                   <h1>รายการร้านอาหารที่มีจำนวนการเข้าชมมากที่สุด</h1>
-                  <table class="table">
+                  <table id="data-table" style="padding-top: 10px;">
                         <thead>
                               <tr>
                                     <th>ลำดับ</th>

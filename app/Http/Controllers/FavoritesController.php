@@ -55,6 +55,7 @@ class FavoritesController extends Controller
             ->leftJoin('restaurant_views', 'restaurants.id', '=', 'restaurant_views.restaurant_id')
             ->where('restaurant_favorites.favorite_by', '=', $user_id)
             ->whereNull('restaurant_favorites.deleted_at')
+            ->whereNull('restaurants.deleted_at')
             ->groupBy(
                 'restaurants.id',
                 'restaurants.restaurant_name',

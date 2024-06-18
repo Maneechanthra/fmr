@@ -403,8 +403,59 @@ form .input-box span.details{
 .prompt-box button:hover {
     background-color: #45a049;
 }
+.box-content1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.img-profile img {
+  border-radius: 50%;
+  padding: 0px;
+  border: 5px solid #936cd1;
+  width: 200px;
+}
 
+.img-profile {
+  position: relative;
+  margin-top: 10px;
+  border-bottom: 1px solid #eaecf1;
+}
+
+.img-profile img {
+  border-radius: 50%;
+  padding: 0px;
+  border: 5px solid #727272;
+  width: 200px;
+}
+.text-form {
+  margin-top: 7px;
+  margin-bottom: 7px;
+  text-align: center;
+
+}
+
+.text-form p {
+  font-size: 18px;
+}
+.container {
+  margin: 0 auto;
+}
   @media screen and (max-width: 700px) {
+    .main-top{
+      display: block;
+    }
+    .users1{
+      width: 100%;
+    }
+    .main-top i{
+      margin: 0px;
+      left: 0px;
+      text-align: center;
+    }
+    .users1 .card1 {
+      margin-top: 30px;
+    }
     table {
       border: 0;
     }

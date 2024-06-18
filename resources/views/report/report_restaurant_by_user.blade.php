@@ -60,7 +60,7 @@
                                     <td data-label="จัดการ">
                                           @if ($restaurantData['reportCount'] < 3) <button class="button-delete" disabled>ยกเลิกการเข้าถึงข้อมูล</button>
                                                 @else
-                                                <form id="updated-status-restaurant-{{ $restaurantId }}" action="{{ route('update-status-restaurant', ['id' => $restaurantId, 'userId' => $userData['userId']]) }}" method="POST">
+                                                <form id="updated-status-restaurant-{{ $restaurantId }}" action="{{ route('update-status-restaurant', ['id' => $restaurantId, 'userId' => $userData->id]) }}" method="POST">
                                                       @csrf
                                                       @method('PUT')
                                                       <button type="button" class="button-delete" onclick="updatedStatus('{{ $restaurantId }}')">ยกเลิกการเข้าถึงข้อมูล</button>
@@ -83,7 +83,7 @@
             console.log(id);
             Swal.fire({
                   title: 'คุณแน่ใจหรือไม่?',
-                  text: "คุณต้องการปรับสถานะผู้ใช้นี้หรือไม่?",
+                  text: "คุณต้องการยกเลิกการเข้าถึงข้อมูลร้านอาหารใช่หรือไม่?",
                   icon: 'warning',
                   showCancelButton: true,
                   confirmButtonColor: '#d33',
