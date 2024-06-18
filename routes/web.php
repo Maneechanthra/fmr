@@ -93,7 +93,7 @@ Route::middleware('isLoggedIn')->group(function () {
       //api image reviews 
       Route::get('/images_verified', [Controller::class, 'sentimgReview']);
       Route::get('/public/verified/{file_name}', function ($filename) {
-            $path = storage_path('app/public/' . $filename);
+            $path = storage_path('app/public/verified/' . $filename);
             if (!File::exists($path)) {
                   abort(404);
             }
