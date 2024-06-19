@@ -50,25 +50,9 @@
 
                                     <td data-label="รูปภาพ">
                                           @foreach($restaurant->image_paths as $image_path)
-                                          <img src="{{ url('/public/verified/' . $image_path) }}" alt="Restaurant Image" style="max-width: 100px; max-height: 100px; margin-right: 10px;">
+                                          <img src="{{ url('public/' . $image_path) }}" alt="Restaurant Image assets" style="max-width: 100px; max-height: 100px; margin-right: 10px;">
                                           @endforeach
                                     </td>
-
-
-                                    <td data-label="รูปภาพ">
-                                          @foreach($restaurant->image_paths as $image_path)
-                                          <img src="{{ asset('storage/' . $image_path) }}" alt="Restaurant Image" style="max-width: 100px; max-height: 100px; margin-right: 10px;">
-
-                                          @endforeach
-                                    </td>
-
-                                    <td data-label="รูปภาพ">
-                                          @foreach($restaurant->image_paths as $image_path)
-                                          <img src="{{ url('storage/' . $image_path) }}" alt="Restaurant Image" style="max-width: 100px; max-height: 100px; margin-right: 10px;">
-                                          @endforeach
-                                    </td>
-
-
 
 
                                     <td data-label="หมายเลขโทรศัพท์ 1">{{ $restaurant-> telephone_1}}</td>
