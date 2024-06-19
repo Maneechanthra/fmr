@@ -50,10 +50,10 @@
 
                                     <td data-label="รูปภาพ">
                                           @foreach($restaurant->image_paths as $image_path)
-                                          <img src="{{ url('public/' . $image_path) }}" alt="Restaurant Image assets" style="max-width: 100px; max-height: 100px; margin-right: 10px;">
+                                          <img src="{{ url('public/' . $image_path) }}" alt="Restaurant Image assets"
+                                                style="max-width: 100px; max-height: 100px; margin-right: 10px;">
                                           @endforeach
                                     </td>
-
 
                                     <td data-label="หมายเลขโทรศัพท์ 1">{{ $restaurant-> telephone_1}}</td>
                                     <td data-label=" หมายเลขโทรศัพท์ 2">{{ $restaurant-> telephone_2}}
@@ -77,17 +77,23 @@
 
 
                                     <td>
-                                          <form id="adjust-form-{{ $restaurant->id }}" action="{{ route('update-verify', ['id' => $restaurant->id, 'userId' => $userData->id]) }}" method="POST">
+                                          <form id="adjust-form-{{ $restaurant->id }}"
+                                                action="{{ route('update-verify', ['id' => $restaurant->id, 'userId' => $userData->id]) }}"
+                                                method="POST">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="button" class="button-status" onclick="confirmAdjust('{{ $restaurant->id }}')">ยืนยัน</button>
+                                                <button type="button" class="button-status"
+                                                      onclick="confirmAdjust('{{ $restaurant->id }}')">ยืนยัน</button>
                                           </form>
 
 
-                                          <form id="adjust-form-{{ $restaurant->id }}" action="{{ route('reject-verify', ['id' => $restaurant->id, 'userId' => $userData->id]) }}" method="POST">
+                                          <form id="adjust-form-{{ $restaurant->id }}"
+                                                action="{{ route('reject-verify', ['id' => $restaurant->id, 'userId' => $userData->id]) }}"
+                                                method="POST">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="button" class="button-delete" onclick="rejectAdjus('{{ $restaurant->id }}')">ปฏิเสธ</button>
+                                                <button type="button" class="button-delete"
+                                                      onclick="rejectAdjus('{{ $restaurant->id }}')">ปฏิเสธ</button>
                                           </form>
 
 
@@ -105,28 +111,28 @@
 
 
 <script>
-      function confirmAdjust(id) {
-            Swal.fire({
-                  title: 'คุณแน่ใจหรือไม่?',
-                  text: "คุณต้องการปรับสถานะรับรองร้านอาหารใช่หรือไม่?",
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'ใช่, แน่นอน!',
-                  cancelButtonText: 'ยกเลิก'
-            }).then((result) => {
-                  if (result.isConfirmed) {
-                        document.getElementById('adjust-form-' + id).submit();
-                  }
-            });
-      }
+function confirmAdjust(id) {
+      Swal.fire({
+            title: 'คุณแน่ใจหรือไม่?',
+            text: "คุณต้องการปรับสถานะรับรองร้านอาหารใช่หรือไม่?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, แน่นอน!',
+            cancelButtonText: 'ยกเลิก'
+      }).then((result) => {
+            if (result.isConfirmed) {
+                  document.getElementById('adjust-form-' + id).submit();
+            }
+      });
+}
 </script>
 <script>
-      function rejectAdjus(restaurantId) {
-            var promptBox = document.createElement("div");
-            promptBox.classList.add("prompt-box");
-            promptBox.innerHTML = `
+function rejectAdjus(restaurantId) {
+      var promptBox = document.createElement("div");
+      promptBox.classList.add("prompt-box");
+      promptBox.innerHTML = `
         <h4>กรุณากรอกเหตุผลที่ปฏิเสธ:</h4>
         <input class="reason" type="text" id="reject-reason" />
         <input type="hidden" id="restaurant-id" value="${restaurantId}" />
@@ -134,74 +140,74 @@
         <button onclick="submitReject()">ตกลง</button>
         <button onclick="closePrompt()">ยกเลิก</button>
     `;
-            document.body.appendChild(promptBox);
-      }
+      document.body.appendChild(promptBox);
+}
 
 
-      function submitReject() {
-            var reasonElement = document.getElementById("reject-reason");
-            var restaurantIdElement = document.getElementById("restaurant-id");
-            var userIdElement = document.getElementById("user-id");
+function submitReject() {
+      var reasonElement = document.getElementById("reject-reason");
+      var restaurantIdElement = document.getElementById("restaurant-id");
+      var userIdElement = document.getElementById("user-id");
 
-            if (reasonElement && restaurantIdElement && userIdElement) {
-                  var reason = reasonElement.value;
-                  var restaurantId = restaurantIdElement.value;
-                  var userId = userIdElement.value;
+      if (reasonElement && restaurantIdElement && userIdElement) {
+            var reason = reasonElement.value;
+            var restaurantId = restaurantIdElement.value;
+            var userId = userIdElement.value;
 
-                  console.log("เหตุผล: " + reason, "restaurant_id: " + restaurantId, " || userId: " + userId);
+            console.log("เหตุผล: " + reason, "restaurant_id: " + restaurantId, " || userId: " + userId);
 
-                  if (reason.trim() !== "") {
-                        Swal.fire({
-                              title: 'คุณแน่ใจหรือไม่?',
-                              text: "คุณต้องการที่จะปฏิเสธร้านอาหารนี้หรือไม่?",
-                              icon: 'warning',
-                              showCancelButton: true,
-                              confirmButtonColor: '#3085d6',
-                              cancelButtonColor: '#d33',
-                              confirmButtonText: 'ใช่, ปฏิเสธ!',
-                              cancelButtonText: 'ยกเลิก'
-                        }).then((result) => {
-                              if (result.isConfirmed) {
-                                    axios.put(`/reject-verify/${restaurantId}/${userId}`, {
-                                                id: restaurantId,
-                                                updated_by: userId,
-                                                reject_detail: reason
-                                          })
-                                          .then(response => {
-                                                console.log(response.data);
-                                                Swal.fire(
-                                                      'ปฏิเสธ!',
-                                                      'การปฏิเสธร้านอาหารสำเร็จแล้ว',
-                                                      'success'
-                                                ).then(() => {
-                                                      window.history
-                                                            .back();
-                                                });
-                                          })
-                                          .catch(error => {
-                                                console.error(error);
-                                                Swal.fire(
-                                                      'ผิดพลาด!',
-                                                      'เกิดข้อผิดพลาดในการปฏิเสธร้านอาหาร',
-                                                      'error'
-                                                );
+            if (reason.trim() !== "") {
+                  Swal.fire({
+                        title: 'คุณแน่ใจหรือไม่?',
+                        text: "คุณต้องการที่จะปฏิเสธร้านอาหารนี้หรือไม่?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'ใช่, ปฏิเสธ!',
+                        cancelButtonText: 'ยกเลิก'
+                  }).then((result) => {
+                        if (result.isConfirmed) {
+                              axios.put(`/reject-verify/${restaurantId}/${userId}`, {
+                                          id: restaurantId,
+                                          updated_by: userId,
+                                          reject_detail: reason
+                                    })
+                                    .then(response => {
+                                          console.log(response.data);
+                                          Swal.fire(
+                                                'ปฏิเสธ!',
+                                                'การปฏิเสธร้านอาหารสำเร็จแล้ว',
+                                                'success'
+                                          ).then(() => {
+                                                window.history
+                                                      .back();
                                           });
-                              }
-                        });
-                  } else {
-                        alert("กรุณากรอกเหตุผลที่ปฏิเสธ");
-                  }
+                                    })
+                                    .catch(error => {
+                                          console.error(error);
+                                          Swal.fire(
+                                                'ผิดพลาด!',
+                                                'เกิดข้อผิดพลาดในการปฏิเสธร้านอาหาร',
+                                                'error'
+                                          );
+                                    });
+                        }
+                  });
             } else {
-                  console.error("One or more elements not found.");
+                  alert("กรุณากรอกเหตุผลที่ปฏิเสธ");
             }
+      } else {
+            console.error("One or more elements not found.");
       }
+}
 
 
 
-      function closePrompt() {
-            var promptBox = document.querySelector(".prompt-box");
-            promptBox.parentNode.removeChild(promptBox);
-      }
+function closePrompt() {
+      var promptBox = document.querySelector(".prompt-box");
+      promptBox.parentNode.removeChild(promptBox);
+}
 </script>
 
 

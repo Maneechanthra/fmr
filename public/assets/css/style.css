@@ -442,6 +442,13 @@ form .input-box span.details{
   margin: 0 auto;
 }
   @media screen and (max-width: 700px) {
+    .users1 .card1 {
+      margin-top: 30px;
+    }
+    .attendance-list {
+      margin-top: 30px;
+
+  }
     .main-top{
       display: block;
     }
@@ -452,9 +459,7 @@ form .input-box span.details{
       margin: 0px;
       left: 0px;
       text-align: center;
-    }
-    .users1 .card1 {
-      margin-top: 30px;
+      margin-bottom: 25px;
     }
     table {
       border: 0;
@@ -476,7 +481,9 @@ form .input-box span.details{
       position: absolute;
       width: 1px;
     }
-  
+    .users{
+      margin-top: 20px;
+    }
     table tr {
       border-bottom: 3px solid #ddd;
       display: block;
@@ -502,8 +509,6 @@ form .input-box span.details{
     }
   }
 
-
-
  @media(max-width: 584px){
  .container{
   max-width: 100%;
@@ -528,4 +533,7 @@ form .user-details .input-box{
   .container .content .category{
     flex-direction: column;
   }
+  .main {
+    width: 300px;
+}
 }
